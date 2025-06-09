@@ -42,6 +42,7 @@ final class ScheduleViewCell: UITableViewCell {
         
         //MARK: setting daySwitch
         daySwitch.addTarget(self, action: #selector(switchToggled(_:)), for: .valueChanged)
+        daySwitch.onTintColor = .blueCastom
         
         customSeparator.backgroundColor = .lightGray
         selectionStyle = .none

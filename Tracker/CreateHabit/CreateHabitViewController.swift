@@ -15,17 +15,23 @@ final class CreateHabitViewController: UIViewController {
     private let categoryArrow = UIImageView()
     private let separatorView = UIView()
     private let scheduleView = UIView()
+    private let subtitlesScheduleLabel = UILabel()
     private let scheduleLabel = UILabel()
     private let scheduleArrow = UIImageView()
     private let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: 50))
+    let collectionEmoji = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     
     private let cancelbutton = UIButton()
     private let createButton = UIButton()
     
     private let stackView = UIStackView()
-    weak var listVC: CreateHabitViewControllerDelegate?
+    weak var listVCDelegate: CreateHabitViewControllerDelegate?
     
     private var schedule: [Weekday] = []
+    
+    let arryEmoji = [
+        "🙂","😻","🌺","🐶","❤️","😱","😇","😡","🥶","🤔","🙌","🍔","🥦","🏓","🥇","🎸","🏝","😪"
+    ]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,6 +39,9 @@ final class CreateHabitViewController: UIViewController {
         settingUI()
         addView()
         addConstraints()
+        collectionEmoji.dataSource = self
+        habitNameTextField.delegate = self
+        updateCreateButtonState()
     }
     
     private func setup() {
@@ -47,6 +56,7 @@ final class CreateHabitViewController: UIViewController {
         habitNameTextField.borderStyle = .none
         habitNameTextField.leftView = paddingView
         habitNameTextField.leftViewMode = .always
+        habitNameTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
         
         //MARK: setting separatorView
         separatorView.backgroundColor = .lightGray
@@ -66,8 +76,11 @@ final class CreateHabitViewController: UIViewController {
         //MARK: setting schedule
         scheduleLabel.text = "Расписание"
         scheduleLabel.textColor = .blackCastom
+        scheduleLabel.font = UIFont.systemFont(ofSize: 17, weight: .regular)
         scheduleArrow.image = UIImage(named: "chevron")
         scheduleArrow.tintColor = .gray
+        subtitlesScheduleLabel.textColor = .grayCastom
+        subtitlesScheduleLabel.font = UIFont.systemFont(ofSize: 17, weight: .regular)
         let tapGesturescheduleTapped = UITapGestureRecognizer(target: self, action: #selector(scheduleTapped))
         scheduleView.addGestureRecognizer(tapGesturescheduleTapped)
         
@@ -99,6 +112,7 @@ final class CreateHabitViewController: UIViewController {
         categoryView.addSubview(categoryArrow)
         scheduleView.addSubview(scheduleLabel)
         scheduleView.addSubview(scheduleArrow)
+        scheduleView.addSubview(subtitlesScheduleLabel)
         containerView.addSubview(categoryView)
         containerView.addSubview(separatorView)
         containerView.addSubview(scheduleView)
@@ -151,7 +165,10 @@ final class CreateHabitViewController: UIViewController {
             make.leading.equalToSuperview().offset(16)
             make.centerY.equalToSuperview()
         }
-        
+        subtitlesScheduleLabel.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(16)
+            make.top.equalTo(scheduleLabel.snp.bottom).offset(2)
+        }
         scheduleArrow.snp.makeConstraints { make in
             make.trailing.equalToSuperview().inset(16)
             make.centerY.equalToSuperview()
@@ -180,17 +197,37 @@ final class CreateHabitViewController: UIViewController {
         guard let title = habitNameTextField.text, !title.isEmpty else {
             return
         }
-        
+        guard !schedule.isEmpty else {
+            let alert = UIAlertController(
+                title: "Ошибка",
+                message: "Пожалуйста, выберите хотя бы один день для расписания.",
+                preferredStyle: .alert
+            )
+            alert.addAction(UIAlertAction(title: "Ок", style: .default, handler: nil))
+            present(alert, animated: true, completion: nil)
+            return
+        }
         let newTracker = Tracker(
             id: UUID(),
             title: title,
             color: .systemBlue,
-            emoji: "📌",
+            emoji: "🙂",
             schedule: self.schedule
         )
         
-        listVC?.didCreateTracker(newTracker)
+        listVCDelegate?.didCreateTracker(newTracker)
         dismiss(animated: true, completion: nil)
+    }
+    @objc private func textFieldDidChange() {
+        updateCreateButtonState()
+    }
+    private func updateCreateButtonState() {
+        let isNameFilled = !(habitNameTextField.text?.isEmpty ?? true)
+        let isScheduleFilled = !schedule.isEmpty
+        let isReady = isNameFilled && isScheduleFilled
+
+        createButton.backgroundColor = isReady ? .blackCastom : .grayCastom
+        createButton.isEnabled = isReady
     }
 }
 
@@ -198,5 +235,28 @@ extension CreateHabitViewController: ScheduleViewControllerDelegate {
     func scheduleViewController(_ controller: ScheduleViewController, didSelectDays days: [Weekday]) {
         print("Выбранные дни: \(days)")
         self.schedule = days
+        let shortWeekdays = days.map { $0.shortForm() }
+        subtitlesScheduleLabel.text = shortWeekdays.joined(separator: ", ")
+        updateCreateButtonState()
+    }
+}
+
+extension CreateHabitViewController: UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        arryEmoji.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? CreateHabitViewCollectionCell else {
+            return UICollectionViewCell()
+        }
+        return cell
+    }
+}
+
+extension CreateHabitViewController: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        habitNameTextField.resignFirstResponder()
+        return true
     }
 }

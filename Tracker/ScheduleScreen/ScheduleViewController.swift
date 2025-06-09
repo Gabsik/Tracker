@@ -47,7 +47,7 @@ final class ScheduleViewController: UIViewController {
     private func addConstraints() {
         tableView.snp.makeConstraints { make in
             make.trailing.leading.equalToSuperview().inset(16)
-            make.top.equalToSuperview().offset(130)
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(24)
             make.bottom.equalToSuperview().inset(157)
         }
         readyButton.snp.makeConstraints { make in
@@ -74,7 +74,7 @@ extension ScheduleViewController: UITableViewDelegate, UITableViewDataSource {
         let weekday = weekdays[indexPath.row]
         let isSelected = selectedDays.contains(weekday)
         cell.delegate = self
-        cell.configure(with: weekday.rawValue.capitalized, isSelected: isSelected)
+        cell.configure(with: weekday.russianName, isSelected: isSelected)
         
         let isFirst = indexPath.row == 0
         let isLast = indexPath.row == weekdays.count - 1

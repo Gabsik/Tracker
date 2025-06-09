@@ -1,16 +1,15 @@
 
-import Foundation
 import UIKit
 import SnapKit
-
-private let datePicker = UIDatePicker()
 
 final class TrackersViewController: UIViewController {
     private var categories: [TrackerCategory] = []
     private var completedTrackers: [TrackerRecord] = []
     private var completedTrackerIDs: Set<UUID> = []
     private let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
-    
+    private let placeholderImageView = UIImageView()
+    private let placeholderLabel = UILabel()
+    private let datePicker = UIDatePicker()
     private var currentDate: Date = Date() {
         didSet {
             updateCompletedTrackerIDs()
@@ -27,6 +26,7 @@ final class TrackersViewController: UIViewController {
         collectionView.dataSource = self
         collectionView.register(TrackersCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
         collectionView.register(CategoryHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header")
+        updatePlaceholderVisibility()
     }
     
     private func setup() {
@@ -56,11 +56,26 @@ final class TrackersViewController: UIViewController {
         datePicker.locale = Locale(identifier: "ru_RU")
         datePicker.addTarget(self, action: #selector(dateChanged(_:)), for: .valueChanged)
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: datePicker)
+        
+        //MARK: setting placeholderImageView
+        placeholderImageView.image = UIImage(named: "placeholder")
+        placeholderImageView.contentMode = .scaleAspectFit
+        
+        //MARK: setting placeholderLabel
+        placeholderLabel.text = "Что будем отслеживать?"
+        placeholderLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
+        placeholderLabel.textColor = .blackCastom
+        placeholderLabel.textAlignment = .center
+        placeholderLabel.numberOfLines = 0
+        
+        placeholderImageView.isHidden = true
+            placeholderLabel.isHidden = true
     }
     
     @objc private func addButtonTapped() {
         let trackerTypeSelectionVC = TrackerTypeSelectionViewController()
-        trackerTypeSelectionVC.listVC = self
+        trackerTypeSelectionVC.listVCDelegate = self
+        trackerTypeSelectionVC.delegate = self
         let navController = UINavigationController(rootViewController: trackerTypeSelectionVC )
         present(navController, animated: true, completion: nil)
     }
@@ -71,15 +86,24 @@ final class TrackersViewController: UIViewController {
     
     private func addView() {
         view.addSubview(collectionView)
+        view.addSubview(placeholderImageView)
+        view.addSubview(placeholderLabel)
         сonstraints()
     }
     
     private func сonstraints() {
         collectionView.snp.makeConstraints { make in
-            //            make.edges.equalToSuperview()
             make.trailing.leading.equalToSuperview().inset(16)
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top).inset(24)
             make.bottom.equalToSuperview()
+        }
+        placeholderImageView.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.centerY.equalToSuperview()
+        }
+        placeholderLabel.snp.makeConstraints { make in
+            make.top.equalTo(placeholderImageView.snp.bottom).offset(8)
+            make.centerX.equalToSuperview()
         }
     }
     private func updateCompletedTrackerIDs() {
@@ -89,8 +113,15 @@ final class TrackersViewController: UIViewController {
     }
     
     private func isTrackerVisible(_ tracker: Tracker) -> Bool {
+        //        let weekday = weekdayFromDate(currentDate)
+        //        return tracker.schedule.contains(weekday)
         let weekday = weekdayFromDate(currentDate)
-        return tracker.schedule.contains(weekday)
+        
+        if let schedule = tracker.schedule {
+            return schedule.contains(weekday)
+        } else {
+            return true
+        }
     }
     
     private func weekdayFromDate(_ date: Date) -> Weekday {
@@ -134,6 +165,13 @@ final class TrackersViewController: UIViewController {
     
     private func getDaysCount(for tracker: Tracker) -> Int {
         completedTrackers.filter { $0.id == tracker.id }.count
+    }
+    
+    private func updatePlaceholderVisibility() {
+        let totalTrackersCount = categories.reduce(0) { $0 + $1.trackers.count }
+        let isEmpty = totalTrackersCount == 0
+        placeholderImageView.isHidden = !isEmpty
+        placeholderLabel.isHidden = !isEmpty
     }
 }
 
@@ -207,5 +245,25 @@ extension TrackersViewController: CreateHabitViewControllerDelegate {
             categories[0] = updatedCategory
         }
         collectionView.reloadData()
+        updatePlaceholderVisibility()
+    }
+}
+
+extension TrackersViewController: IrregularEventViewControllerDelegate {
+    func didCreatedIrregularevent(_ tracker: Tracker) {
+        if categories.isEmpty {
+            //             categories = [TrackerCategory(title: "Мои трекеры", trackers: [tracker])]
+            let defaultCategory = TrackerCategory(title: "Мои трекеры", trackers: [tracker])
+            categories.append(defaultCategory)
+        } else {
+            let oldCategory = categories[0]
+            let updatedCategory = TrackerCategory(
+                title: oldCategory.title,
+                trackers: oldCategory.trackers + [tracker]
+            )
+            categories[0] = updatedCategory
+        }
+        collectionView.reloadData()
+        updatePlaceholderVisibility()
     }
 }

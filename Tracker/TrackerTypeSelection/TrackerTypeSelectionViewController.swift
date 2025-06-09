@@ -2,12 +2,13 @@
 import UIKit
 import SnapKit
 
-class TrackerTypeSelectionViewController: UIViewController {
+final class TrackerTypeSelectionViewController: UIViewController {
     let habitButton = UIButton()
     let irregularEventBitton = UIButton()
     let stackView = UIStackView()
-    weak var listVC: CreateHabitViewControllerDelegate?
-
+    weak var listVCDelegate: CreateHabitViewControllerDelegate?
+    weak var delegate: IrregularEventViewControllerDelegate?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
@@ -26,12 +27,13 @@ class TrackerTypeSelectionViewController: UIViewController {
         habitButton.setTitle("Привычка", for: .normal)
         habitButton.backgroundColor = .blackCastom
         habitButton.layer.cornerRadius = 16
-        habitButton.addTarget(self, action: #selector(addButtonTapped), for: .touchUpInside)
+        habitButton.addTarget(self, action: #selector(addHabitButtonTapped), for: .touchUpInside)
         
-        //MARK: settingirregularEventBitton
+        //MARK: setting irregularEventBitton
         irregularEventBitton.setTitle("Нерегулярное Событие", for: .normal)
         irregularEventBitton.backgroundColor = .blackCastom
         irregularEventBitton.layer.cornerRadius = 16
+        irregularEventBitton.addTarget(self, action: #selector(addirregularEventButtonTapped), for: .touchUpInside)
         
         //MARK: settingstackView
         stackView.axis = .vertical
@@ -59,10 +61,17 @@ class TrackerTypeSelectionViewController: UIViewController {
         }
     }
     
-    @objc private func addButtonTapped() {
+    @objc private func addHabitButtonTapped() {
         let createHabitVC = CreateHabitViewController()
-        createHabitVC.listVC = listVC
+        createHabitVC.listVCDelegate = listVCDelegate
         let navController = UINavigationController(rootViewController: createHabitVC )
+        present(navController, animated: true, completion: nil)
+    }
+    
+    @objc private func addirregularEventButtonTapped() {
+        let irregularEventVC = IrregularEventViewController()
+        irregularEventVC.delegate = delegate
+        let navController = UINavigationController(rootViewController: irregularEventVC)
         present(navController, animated: true, completion: nil)
     }
 }

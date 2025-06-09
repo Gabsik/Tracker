@@ -7,12 +7,13 @@ protocol TrackersCollectionViewCellDelegate: AnyObject {
 
 final class TrackersCollectionViewCell: UICollectionViewCell {
     
-    let titleEmojiesLabel = UILabel()
-    let nameLabel = UILabel()
-    let containerView = UIView()
-    let numberDaysLabel = UILabel()
-    let checkMarkButton = UIButton()
-    let containerButtonView = UIView()
+    private let titleEmojiesLabel = UILabel()
+    private let nameLabel = UILabel()
+    private let containerView = UIView()
+    private let numberDaysLabel = UILabel()
+    private let checkMarkButton = UIButton()
+    private let containerButtonView = UIView()
+    private let containerEmojiesView = UIView()
     
     private var isCompletedToday: Bool = false
     private var daysCount: Int = 0
@@ -23,8 +24,18 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        nameLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
+        nameLabel.textColor = .white
+        
+        titleEmojiesLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        
+        containerEmojiesView.layer.cornerRadius = 12
+        containerEmojiesView.backgroundColor = UIColor.white.withAlphaComponent(0.3)
+        containerEmojiesView.clipsToBounds = true
+        
         contentView.addSubview(containerView)
-        containerView.addSubview(titleEmojiesLabel)
+        containerView.addSubview(containerEmojiesView)
+        containerEmojiesView.addSubview(titleEmojiesLabel)
         containerView.addSubview(nameLabel)
         contentView.addSubview(containerButtonView)
         containerButtonView.addSubview(checkMarkButton)
@@ -46,9 +57,14 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
             make.trailing.equalToSuperview().inset(0)
             make.bottom.equalToSuperview().inset(58)
         }
-        titleEmojiesLabel.snp.makeConstraints { make in
+        containerEmojiesView.snp.makeConstraints { make in
             make.top.equalToSuperview().inset(12)
             make.leading.equalToSuperview().offset(12)
+            
+            make.size.equalTo(24)
+        }
+        titleEmojiesLabel.snp.makeConstraints { make in
+            make.center.equalToSuperview()
         }
         containerButtonView.snp.makeConstraints { make in
             make.top.equalTo(containerView.snp.bottom).inset(0)
@@ -82,11 +98,29 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
         numberDaysLabel.text = "\(daysCount) дней"
         containerView.backgroundColor = tracker.color
         
-        let imageName = isCompletedToday ? "readyButton" : "checkMarkButton"
+        let imageName = isCompletedToday ? "Done" : "checkMarkButton"
         checkMarkButton.setImage(UIImage(named: imageName), for: .normal)
+        
+        if isCompletedToday {
+            let checkmarkImage = UIImage(named: "Done")?.withRenderingMode(.alwaysOriginal)
+            checkMarkButton.setImage(checkmarkImage, for: .normal)
+            checkMarkButton.tintColor = tracker.color
+            checkMarkButton.backgroundColor = tracker.color
+            
+        } else {
+            // Когда задача не выполнена, показываем обычную кнопку с template
+            let checkmarkImage = UIImage(named: "checkMarkButton")?.withRenderingMode(.alwaysTemplate)
+            checkMarkButton.setImage(checkmarkImage, for: .normal)
+            checkMarkButton.tintColor = tracker.color
+            checkMarkButton.backgroundColor = .clear
+        }
+        
+        checkMarkButton.layer.cornerRadius = checkMarkButton.bounds.width / 2
+        checkMarkButton.layer.masksToBounds = true
         
         checkMarkButton.isEnabled = !isFutureDate
         checkMarkButton.alpha = isFutureDate ? 0.3 : 1
+        
     }
     
     @objc private func checkMarkButtonTapped() {
@@ -96,7 +130,7 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
     func update(isCompletedToday: Bool, daysCount: Int) {
         self.isCompletedToday = isCompletedToday
         self.daysCount = daysCount
-        let buttonImageName = isCompletedToday ? "readyButton" : "checkMarkButton"
+        let buttonImageName = isCompletedToday ? "Done" : "checkMarkButton"
         checkMarkButton.setImage(UIImage(named: buttonImageName), for: .normal)
         numberDaysLabel.text = "\(daysCount) дней"
     }
