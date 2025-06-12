@@ -67,9 +67,8 @@ final class TrackersViewController: UIViewController {
         placeholderLabel.textColor = .blackCastom
         placeholderLabel.textAlignment = .center
         placeholderLabel.numberOfLines = 0
-        
         placeholderImageView.isHidden = true
-            placeholderLabel.isHidden = true
+        placeholderLabel.isHidden = true
     }
     
     @objc private func addButtonTapped() {

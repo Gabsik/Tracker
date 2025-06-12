@@ -11,6 +11,7 @@ class CreateHabitViewCollectionCell: UICollectionViewCell {
         super.init(frame: frame)
         contentView.addSubview(titleLabel)
         constraints()
+        titleLabel.font = UIFont.systemFont(ofSize: 32, weight: .bold)
 }
     private func constraints () {
         titleLabel.snp.makeConstraints { make in

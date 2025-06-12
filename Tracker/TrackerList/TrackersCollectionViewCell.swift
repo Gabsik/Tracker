@@ -28,7 +28,8 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
         nameLabel.textColor = .white
         
         titleEmojiesLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        
+        checkMarkButton.imageView?.contentMode = .scaleAspectFit
+
         containerEmojiesView.layer.cornerRadius = 12
         containerEmojiesView.backgroundColor = UIColor.white.withAlphaComponent(0.3)
         containerEmojiesView.clipsToBounds = true
@@ -88,6 +89,7 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
         }
     }
     
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -98,15 +100,15 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
         numberDaysLabel.text = "\(daysCount) дней"
         containerView.backgroundColor = tracker.color
         
-        let imageName = isCompletedToday ? "Done" : "checkMarkButton"
+        let imageName = isCompletedToday ? "Property" : "checkMarkButton"
         checkMarkButton.setImage(UIImage(named: imageName), for: .normal)
         
         if isCompletedToday {
-            let checkmarkImage = UIImage(named: "Done")?.withRenderingMode(.alwaysOriginal)
-            checkMarkButton.setImage(checkmarkImage, for: .normal)
-            checkMarkButton.tintColor = tracker.color
-            checkMarkButton.backgroundColor = tracker.color
-            
+            let image = UIImage(named: "Property")?.withRenderingMode(.alwaysOriginal)
+            checkMarkButton.setImage(image, for: .normal)
+            checkMarkButton.tintColor = nil
+            checkMarkButton.backgroundColor = tracker.color.withAlphaComponent(0.5)
+            checkMarkButton.imageView?.contentMode = .scaleAspectFit
         } else {
             // Когда задача не выполнена, показываем обычную кнопку с template
             let checkmarkImage = UIImage(named: "checkMarkButton")?.withRenderingMode(.alwaysTemplate)
@@ -114,13 +116,9 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
             checkMarkButton.tintColor = tracker.color
             checkMarkButton.backgroundColor = .clear
         }
-        
-        checkMarkButton.layer.cornerRadius = checkMarkButton.bounds.width / 2
         checkMarkButton.layer.masksToBounds = true
-        
         checkMarkButton.isEnabled = !isFutureDate
         checkMarkButton.alpha = isFutureDate ? 0.3 : 1
-        
     }
     
     @objc private func checkMarkButtonTapped() {
@@ -130,7 +128,7 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
     func update(isCompletedToday: Bool, daysCount: Int) {
         self.isCompletedToday = isCompletedToday
         self.daysCount = daysCount
-        let buttonImageName = isCompletedToday ? "Done" : "checkMarkButton"
+        let buttonImageName = isCompletedToday ? "Property" : "checkMarkButton"
         checkMarkButton.setImage(UIImage(named: buttonImageName), for: .normal)
         numberDaysLabel.text = "\(daysCount) дней"
     }
