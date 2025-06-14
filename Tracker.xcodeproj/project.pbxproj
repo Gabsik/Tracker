@@ -10,6 +10,7 @@
 		0D8920F52DEF6A63008EBD61 /* CategoryHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D8920F42DEF6A63008EBD61 /* CategoryHeaderView.swift */; };
 		0D8EFADB2DDE51FC00B3CB23 /* StatisticsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D8EFADA2DDE51FC00B3CB23 /* StatisticsViewController.swift */; };
 		0D8EFAE02DDF7A4A00B3CB23 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 0D8EFADF2DDF7A4A00B3CB23 /* SnapKit */; };
+		0D93BA182DFD94C90049BB05 /* TrackerDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 0D93BA162DFD94C90049BB05 /* TrackerDataModel.xcdatamodeld */; };
 		0D9C999C2DDCFF4F00DF2CF3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D9C999B2DDCFF4F00DF2CF3 /* AppDelegate.swift */; };
 		0D9C999E2DDCFF4F00DF2CF3 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D9C999D2DDCFF4F00DF2CF3 /* SceneDelegate.swift */; };
 		0D9C99A52DDCFF5500DF2CF3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0D9C99A42DDCFF5500DF2CF3 /* Assets.xcassets */; };
@@ -33,6 +34,7 @@
 /* Begin PBXFileReference section */
 		0D8920F42DEF6A63008EBD61 /* CategoryHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryHeaderView.swift; sourceTree = "<group>"; };
 		0D8EFADA2DDE51FC00B3CB23 /* StatisticsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsViewController.swift; sourceTree = "<group>"; };
+		0D93BA172DFD94C90049BB05 /* TrackerDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TrackerDataModel.xcdatamodel; sourceTree = "<group>"; };
 		0D9C99982DDCFF4F00DF2CF3 /* Tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0D9C999B2DDCFF4F00DF2CF3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0D9C999D2DDCFF4F00DF2CF3 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -99,6 +101,7 @@
 				0D9C99A42DDCFF5500DF2CF3 /* Assets.xcassets */,
 				0D9C99A62DDCFF5500DF2CF3 /* LaunchScreen.storyboard */,
 				0D9C99A92DDCFF5500DF2CF3 /* Info.plist */,
+				0D93BA162DFD94C90049BB05 /* TrackerDataModel.xcdatamodeld */,
 			);
 			path = Tracker;
 			sourceTree = "<group>";
@@ -246,6 +249,7 @@
 				0DF51EA82DE61777001C5745 /* TrackerCategory.swift in Sources */,
 				0D9C99B02DDE467100DF2CF3 /* Extension UIColor.swift in Sources */,
 				0D8EFADB2DDE51FC00B3CB23 /* StatisticsViewController.swift in Sources */,
+				0D93BA182DFD94C90049BB05 /* TrackerDataModel.xcdatamodeld in Sources */,
 				0DAF63C02DF0A54B00D1C7EA /* CreateHabitViewController.swift in Sources */,
 				0DAF63C22DF1E4C600D1C7EA /* ScheduleViewController.swift in Sources */,
 				0DBEA38F2DF8AEBA00F18614 /* ColorCollectionCell.swift in Sources */,
@@ -493,6 +497,19 @@
 			productName = SnapKit;
 		};
 /* End XCSwiftPackageProductDependency section */
+
+/* Begin XCVersionGroup section */
+		0D93BA162DFD94C90049BB05 /* TrackerDataModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				0D93BA172DFD94C90049BB05 /* TrackerDataModel.xcdatamodel */,
+			);
+			currentVersion = 0D93BA172DFD94C90049BB05 /* TrackerDataModel.xcdatamodel */;
+			path = TrackerDataModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 0D9C99902DDCFF4F00DF2CF3 /* Project object */;
 }
