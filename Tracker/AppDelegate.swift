@@ -6,20 +6,43 @@
 //
 
 import UIKit
+import CoreData
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
+    lazy var persistentContainer: NSPersistentContainer = {
+        let container = NSPersistentContainer(name: "TrackerDataModel")
+        container.loadPersistentStores { storeDescription, error in
+            if let error = error as NSError? {
+                fatalError("Unresolved error: \(error), \(error.userInfo)")
+            }
+        }
+        return container
+    }()
+    
+    func saveContext () {
+        let context = persistentContainer.viewContext
+        if context.hasChanges {
+            do {
+                try context.save()
+            } catch {
+                let error = error as NSError
+                fatalError("Unresolved error saving context: \(error), \(error.userInfo)")
+            }
+        }
+    }
+    
     var window: UIWindow?
     let tabBarController = UITabBarController()
-//    let viewController = ViewController()
-//    let statisticsViewController = StatisticsViewController()
+    //    let viewController = ViewController()
+    //    let statisticsViewController = StatisticsViewController()
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         window = UIWindow()
         
-//        tabBarController.setViewControllers([viewController, statisticsViewController], animated: true)
+        //        tabBarController.setViewControllers([viewController, statisticsViewController], animated: true)
         
         window?.rootViewController = tabBarController
         window?.makeKeyAndVisible()
@@ -29,7 +52,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // MARK: UISceneSession Lifecycle
     
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
-
+        
         return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
     }
     
