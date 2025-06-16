@@ -14,6 +14,7 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
     private let checkMarkButton = UIButton()
     private let containerButtonView = UIView()
     private let containerEmojiesView = UIView()
+    private let overlayImageView = UIImageView()
     
     private var isCompletedToday: Bool = false
     private var daysCount: Int = 0
@@ -29,7 +30,7 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
         
         titleEmojiesLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         checkMarkButton.imageView?.contentMode = .scaleAspectFit
-
+        
         containerEmojiesView.layer.cornerRadius = 12
         containerEmojiesView.backgroundColor = UIColor.white.withAlphaComponent(0.3)
         containerEmojiesView.clipsToBounds = true
@@ -41,6 +42,7 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(containerButtonView)
         containerButtonView.addSubview(checkMarkButton)
         containerButtonView.addSubview(numberDaysLabel)
+        checkMarkButton.addSubview(overlayImageView)
         
         containerButtonView.backgroundColor = .white
         containerView.layer.cornerRadius = 16
@@ -48,9 +50,13 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
         numberDaysLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         numberDaysLabel.numberOfLines = 2
         
-        let image = UIImage(named: "checkMarkButton")
-        checkMarkButton.setImage(image, for: .normal)
+        //        let image = UIImage(named: "checkMarkButton")
+        //        checkMarkButton.setImage(image, for: .normal)
+        checkMarkButton.layer.cornerRadius = 17
         checkMarkButton.addTarget(self, action: #selector(checkMarkButtonTapped), for: .touchUpInside)
+        
+        overlayImageView.contentMode = .scaleAspectFit
+        overlayImageView.isUserInteractionEnabled = false
         
         containerView.snp.makeConstraints { make in
             make.top.equalToSuperview().inset(0)
@@ -82,10 +88,15 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
         checkMarkButton.snp.makeConstraints { make in
             make.top.equalToSuperview().inset(8)
             make.trailing.equalToSuperview().inset(12)
+            make.height.equalTo(34)
+            make.width.equalTo(34)
         }
         numberDaysLabel.snp.makeConstraints { make in
             make.top.equalToSuperview().inset(16)
             make.leading.equalToSuperview().offset(12)
+        }
+        overlayImageView.snp.makeConstraints { make in
+            make.edges.equalToSuperview().inset(11)
         }
     }
     
@@ -104,17 +115,21 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
         checkMarkButton.setImage(UIImage(named: imageName), for: .normal)
         
         if isCompletedToday {
-            let image = UIImage(named: "Property")?.withRenderingMode(.alwaysOriginal)
+            let image = UIImage(named: "Property")?.withRenderingMode(.alwaysTemplate)
             checkMarkButton.setImage(image, for: .normal)
             checkMarkButton.tintColor = nil
             checkMarkButton.backgroundColor = tracker.color.withAlphaComponent(0.5)
             checkMarkButton.imageView?.contentMode = .scaleAspectFit
+            
+            overlayImageView.image = UIImage(named: "Done")
+            overlayImageView.isHidden = false
+            
         } else {
-            // Когда задача не выполнена, показываем обычную кнопку с template
             let checkmarkImage = UIImage(named: "checkMarkButton")?.withRenderingMode(.alwaysTemplate)
             checkMarkButton.setImage(checkmarkImage, for: .normal)
             checkMarkButton.tintColor = tracker.color
             checkMarkButton.backgroundColor = .clear
+            overlayImageView.isHidden = true
         }
         checkMarkButton.layer.masksToBounds = true
         checkMarkButton.isEnabled = !isFutureDate
@@ -128,9 +143,27 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
     func update(isCompletedToday: Bool, daysCount: Int) {
         self.isCompletedToday = isCompletedToday
         self.daysCount = daysCount
-        let buttonImageName = isCompletedToday ? "Property" : "checkMarkButton"
-        checkMarkButton.setImage(UIImage(named: buttonImageName), for: .normal)
         numberDaysLabel.text = "\(daysCount) дней"
+        
+        if isCompletedToday {
+            let baseImage = UIImage(named: "Property")?.withRenderingMode(.alwaysTemplate)
+            checkMarkButton.setImage(baseImage, for: .normal)
+            
+            overlayImageView.image = UIImage(named: "Done")
+            overlayImageView.isHidden = false
+            
+            checkMarkButton.backgroundColor = tracker?.color.withAlphaComponent(0.5)
+            checkMarkButton.tintColor = nil
+        } else {
+            let baseImage = UIImage(named: "checkMarkButton")?.withRenderingMode(.alwaysTemplate)
+            checkMarkButton.setImage(baseImage, for: .normal)
+            
+            overlayImageView.isHidden = true
+            checkMarkButton.backgroundColor = .clear
+            checkMarkButton.tintColor = tracker?.color
+        }
+        
+        checkMarkButton.layer.masksToBounds = true
     }
 }
 
