@@ -81,7 +81,7 @@ final class CreateHabitViewController: UIViewController {
         habitNameTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
         
         //MARK: setting separatorView
-        separatorView.backgroundColor = .lightGray
+        separatorView.backgroundColor = .grayCastom
         
         //MARK: setting containerView
         containerView.backgroundColor = .background
@@ -157,7 +157,7 @@ final class CreateHabitViewController: UIViewController {
         
         contentView.snp.makeConstraints { make in
             make.edges.equalTo(scrollView)
-            make.width.equalTo(scrollView) // очень важно!
+            make.width.equalTo(scrollView)
         }
         
         habitNameTextField.snp.makeConstraints { make in
@@ -189,7 +189,7 @@ final class CreateHabitViewController: UIViewController {
         separatorView.snp.makeConstraints { make in
             make.top.equalTo(categoryView.snp.bottom)
             make.leading.trailing.equalToSuperview().inset(16)
-            make.height.equalTo(1)
+            make.height.equalTo(1.0 / UIScreen.main.scale)
         }
         
         scheduleView.snp.makeConstraints { make in
@@ -279,7 +279,8 @@ final class CreateHabitViewController: UIViewController {
             title: title,
             color: color,
             emoji: emoji,
-            schedule: self.schedule
+            schedule: self.schedule,
+            createdAt: Date()
         )
         
         listVCDelegate?.didCreateTracker(newTracker)
@@ -291,7 +292,10 @@ final class CreateHabitViewController: UIViewController {
     private func updateCreateButtonState() {
         let isNameFilled = !(habitNameTextField.text?.isEmpty ?? true)
         let isScheduleFilled = !schedule.isEmpty
-        let isReady = isNameFilled && isScheduleFilled
+        let isEmojiSelected = selectedEmoji != nil
+        let isColorSelected = selectedColor != nil
+        
+        let isReady = isNameFilled && isScheduleFilled && isEmojiSelected && isColorSelected
         
         createButton.backgroundColor = isReady ? .blackCastom : .grayCastom
         createButton.isEnabled = isReady
@@ -360,7 +364,6 @@ extension CreateHabitViewController: UICollectionViewDelegateFlowLayout {
         guard kind == UICollectionView.elementKindSectionHeader else {
             return UICollectionReusableView()
         }
-        
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind,
                                                                      withReuseIdentifier: "header",
                                                                      for: indexPath) as! HeaderReusableView
@@ -390,6 +393,7 @@ extension CreateHabitViewController: UICollectionViewDelegateFlowLayout {
             selectedColor = colorArray[indexPath.item]
         }
         collectionView.reloadData()
+        updateCreateButtonState()
     }
 }
 

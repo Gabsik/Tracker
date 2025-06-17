@@ -14,7 +14,14 @@ final class TrackersViewController: UIViewController {
         didSet {
             updateCompletedTrackerIDs()
             collectionView.reloadData()
+            updatePlaceholderVisibility()
         }
+    }
+    private var visibleCategories: [TrackerCategory] {
+        categories.map { category in
+            let visibleTrackers = category.trackers.filter { isTrackerVisible($0) }
+            return TrackerCategory(title: category.title, trackers: visibleTrackers)
+        }.filter { !$0.trackers.isEmpty }
     }
     
     override func viewDidLoad() {
@@ -75,6 +82,7 @@ final class TrackersViewController: UIViewController {
         let trackerTypeSelectionVC = TrackerTypeSelectionViewController()
         trackerTypeSelectionVC.listVCDelegate = self
         trackerTypeSelectionVC.delegate = self
+        trackerTypeSelectionVC.currentDate = self.currentDate
         let navController = UINavigationController(rootViewController: trackerTypeSelectionVC )
         present(navController, animated: true, completion: nil)
     }
@@ -110,19 +118,30 @@ final class TrackersViewController: UIViewController {
                                     .filter { Calendar.current.isDate($0.date, inSameDayAs: currentDate) }
                                     .map { $0.id })
     }
-    
     private func isTrackerVisible(_ tracker: Tracker) -> Bool {
-        //        let weekday = weekdayFromDate(currentDate)
-        //        return tracker.schedule.contains(weekday)
-        let weekday = weekdayFromDate(currentDate)
-        
         if let schedule = tracker.schedule {
+            // Привычка по расписанию
+            let weekday = weekdayFromDate(currentDate)
             return schedule.contains(weekday)
-        } else {
-            return true
         }
+        guard let createdAt = tracker.createdAt else {
+            return false
+        }
+        let currentDay = Calendar.current.startOfDay(for: currentDate)
+        let createdDay = Calendar.current.startOfDay(for: createdAt)
+        if currentDay < createdDay {
+            return false
+        }
+        if let completion = completedTrackers
+            .first(where: { $0.id == tracker.id }) {
+            let completedDay = Calendar.current.startOfDay(for: completion.date)
+            
+            if currentDay > completedDay {
+                return false
+            }
+        }
+        return true
     }
-    
     private func weekdayFromDate(_ date: Date) -> Weekday {
         let weekdayIndex = Calendar.current.component(.weekday, from: date)
         let weekday: Weekday
@@ -167,8 +186,7 @@ final class TrackersViewController: UIViewController {
     }
     
     private func updatePlaceholderVisibility() {
-        let totalTrackersCount = categories.reduce(0) { $0 + $1.trackers.count }
-        let isEmpty = totalTrackersCount == 0
+        let isEmpty = visibleCategories.isEmpty
         placeholderImageView.isHidden = !isEmpty
         placeholderLabel.isHidden = !isEmpty
     }
@@ -176,19 +194,19 @@ final class TrackersViewController: UIViewController {
 
 extension TrackersViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        categories.count
+        visibleCategories.count
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        let trackers = categories[section].trackers.filter { isTrackerVisible($0) }
-        return trackers.count
+        return visibleCategories[section].trackers.count
+        
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? TrackersCollectionViewCell else {
             return UICollectionViewCell()
         }
-        let tracker = categories[indexPath.section].trackers.filter { isTrackerVisible($0) }[indexPath.item]
+        let tracker = visibleCategories[indexPath.section].trackers[indexPath.item]
         let isCompleted = completedTrackerIDs.contains(tracker.id)
         let daysCount = getDaysCount(for: tracker)
         let isFuture = currentDate > Date()
@@ -207,7 +225,8 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
         guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "header", for: indexPath) as? CategoryHeaderView else {
             return UICollectionReusableView()
         }
-        header.titleLabel.text = categories[indexPath.section].title
+        header.titleLabel.text = visibleCategories[indexPath.section].title
+        
         return header
     }
     func collectionView(_ collectionView: UICollectionView,

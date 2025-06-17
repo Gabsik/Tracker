@@ -15,6 +15,7 @@ class IrregularEventViewController: UIViewController {
     private let cancelbutton = UIButton()
     private let createButton = UIButton()
     private let stackView = UIStackView()
+    var trackerDate: Date = Date()
     
     weak var delegate: IrregularEventViewControllerDelegate?
     
@@ -25,6 +26,7 @@ class IrregularEventViewController: UIViewController {
         addView()
         addConstraints()
         updateCreateButtonState()
+        irregularEventTextField.delegate = self
     }
     private func setup() {
         view.backgroundColor = .white
@@ -39,12 +41,6 @@ class IrregularEventViewController: UIViewController {
         irregularEventTextField.leftView = paddingView
         irregularEventTextField.leftViewMode = .always
         irregularEventTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
-
-        
-//        //MARK: setting containerView
-//        containerView.backgroundColor = .background
-//        containerView.layer.cornerRadius = 16
-//        containerView.clipsToBounds = true
         
         //MARK: setting category
         categoryLabel.text = "Категория"
@@ -97,11 +93,6 @@ class IrregularEventViewController: UIViewController {
             make.height.equalTo(75)
         }
         
-//        containerView.snp.makeConstraints { make in
-//            make.top.equalTo(irregularEventTextField.snp.bottom).offset(24)
-//            make.leading.trailing.equalToSuperview().inset(16)
-//        }
-        
         categoryView.snp.makeConstraints { make in
             make.top.equalTo(irregularEventTextField.snp.bottom).offset(24)
             make.leading.trailing.equalToSuperview().inset(16)
@@ -139,9 +130,9 @@ class IrregularEventViewController: UIViewController {
             title: title,
             color: .systemBlue,
             emoji: "🙂",
-            schedule: nil
+            schedule: nil,
+            createdAt: trackerDate
         )
-        
         delegate?.didCreatedIrregularevent(newTracker)
         dismiss(animated: true, completion: nil)
     }
@@ -150,10 +141,16 @@ class IrregularEventViewController: UIViewController {
     }
     private func updateCreateButtonState() {
         let isNameFilled = !(irregularEventTextField.text?.isEmpty ?? true)
-//        let isScheduleFilled = !schedule.isEmpty
         let isReady = isNameFilled
-
+        
         createButton.backgroundColor = isReady ? .blackCastom : .grayCastom
         createButton.isEnabled = isReady
+    }
+}
+
+extension IrregularEventViewController: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        irregularEventTextField.resignFirstResponder()
+        return true
     }
 }

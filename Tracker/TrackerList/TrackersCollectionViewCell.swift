@@ -50,8 +50,6 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
         numberDaysLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         numberDaysLabel.numberOfLines = 2
         
-        //        let image = UIImage(named: "checkMarkButton")
-        //        checkMarkButton.setImage(image, for: .normal)
         checkMarkButton.layer.cornerRadius = 17
         checkMarkButton.addTarget(self, action: #selector(checkMarkButtonTapped), for: .touchUpInside)
         
@@ -106,6 +104,7 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
     }
     
     func configure(with tracker: Tracker, daysCount: Int, isCompletedToday: Bool, isFutureDate: Bool) {
+        self.tracker = tracker
         nameLabel.text = tracker.title
         titleEmojiesLabel.text = tracker.emoji
         numberDaysLabel.text = "\(daysCount) дней"
@@ -117,7 +116,7 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
         if isCompletedToday {
             let image = UIImage(named: "Property")?.withRenderingMode(.alwaysTemplate)
             checkMarkButton.setImage(image, for: .normal)
-            checkMarkButton.tintColor = nil
+            checkMarkButton.tintColor = tracker.color
             checkMarkButton.backgroundColor = tracker.color.withAlphaComponent(0.5)
             checkMarkButton.imageView?.contentMode = .scaleAspectFit
             
@@ -128,7 +127,7 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
             let checkmarkImage = UIImage(named: "checkMarkButton")?.withRenderingMode(.alwaysTemplate)
             checkMarkButton.setImage(checkmarkImage, for: .normal)
             checkMarkButton.tintColor = tracker.color
-            checkMarkButton.backgroundColor = .clear
+            //            checkMarkButton.backgroundColor = .clear
             overlayImageView.isHidden = true
         }
         checkMarkButton.layer.masksToBounds = true
@@ -153,7 +152,7 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
             overlayImageView.isHidden = false
             
             checkMarkButton.backgroundColor = tracker?.color.withAlphaComponent(0.5)
-            checkMarkButton.tintColor = nil
+            checkMarkButton.tintColor = tracker?.color
         } else {
             let baseImage = UIImage(named: "checkMarkButton")?.withRenderingMode(.alwaysTemplate)
             checkMarkButton.setImage(baseImage, for: .normal)

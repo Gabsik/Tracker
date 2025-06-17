@@ -8,6 +8,7 @@ final class TrackerTypeSelectionViewController: UIViewController {
     let stackView = UIStackView()
     weak var listVCDelegate: CreateHabitViewControllerDelegate?
     weak var delegate: IrregularEventViewControllerDelegate?
+    var currentDate: Date!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -71,6 +72,7 @@ final class TrackerTypeSelectionViewController: UIViewController {
     @objc private func addirregularEventButtonTapped() {
         let irregularEventVC = IrregularEventViewController()
         irregularEventVC.delegate = delegate
+        irregularEventVC.trackerDate = currentDate
         let navController = UINavigationController(rootViewController: irregularEventVC)
         present(navController, animated: true, completion: nil)
     }

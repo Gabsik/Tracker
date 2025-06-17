@@ -8,6 +8,7 @@ struct Tracker {
     let color: UIColor
     let emoji: String
     let schedule: [Weekday]?
+    let createdAt: Date?
 }
 enum Weekday: String, CaseIterable {
     case monday, tuesday, wednesday, thursday, friday, saturday, sunday
