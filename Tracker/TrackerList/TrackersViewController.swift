@@ -24,8 +24,17 @@ final class TrackersViewController: UIViewController {
             return TrackerCategory(title: category.title, trackers: visibleTrackers)
         }.filter { !$0.trackers.isEmpty }
     }
+    //    private let trackerStore: TrackerStore = {
+    //        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    //        let context = appDelegate.persistentContainer.viewContext
+    //        return TrackerStore(context: context)
+    //    }()
     private let trackerStore: TrackerStore = {
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        guard
+            let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        else {
+            fatalError("Unable to get AppDelegate or its persistentContainer")
+        }
         let context = appDelegate.persistentContainer.viewContext
         return TrackerStore(context: context)
     }()
@@ -45,9 +54,10 @@ final class TrackersViewController: UIViewController {
         ]
         trackerStore.delegate = self
         let today = currentDate
-        currentDate = Calendar.current.date(byAdding: .day, value: 1, to: today)!
-        currentDate = today
-        
+        if let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: today) {
+            currentDate = tomorrow
+            currentDate = today
+        }
     }
     
     private func setup() {

@@ -29,30 +29,12 @@ final class TrackerStore: NSObject {
         fetchedResultsController = frc
     }
     
-//    func fetchTrackers() -> [Tracker] {
-//        fetchedResultsController?.fetchedObjects?.compactMap { $0.toTracker() } ?? []
-//    }
     func fetchTrackers() -> [Tracker] {
         let result = fetchedResultsController?.fetchedObjects?.compactMap { $0.toTracker() } ?? []
         print("Fetched trackers count: \(result.count)")
         return result
     }
     
-    //    func addNewTracker(_ tracker: Tracker) throws {
-    //        let entity = TrackerCoreData(context: context)
-    //        entity.id = tracker.id
-    //        entity.title = tracker.title
-    //        entity.emoji = tracker.emoji
-    //        entity.createdAt = tracker.createdAt
-    //
-    //        if let schedule = tracker.schedule {
-    //            entity.schedule = schedule.map { $0.rawValue } as NSArray
-    //        }
-    //
-    //        entity.color = UIColorMarshalling.serialize(tracker.color)
-    //
-    //        try context.save()
-    //    }
     func addNewTracker(_ tracker: Tracker) throws {
         let entity = TrackerCoreData(context: context)
         entity.id = tracker.id
@@ -64,7 +46,6 @@ final class TrackerStore: NSObject {
         }
         entity.color = UIColorMarshalling.serialize(tracker.color)
 
-        // Ищем или создаём категорию
         let request: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
         request.predicate = NSPredicate(format: "title == %@", "Мои трекеры")
 
@@ -77,7 +58,6 @@ final class TrackerStore: NSObject {
             category.title = "Мои трекеры"
         }
 
-        // Привязываем категорию к трекеру
         entity.category = category
 
         try context.save()

@@ -1,5 +1,4 @@
 import Foundation
-import UIKit
 
 extension TrackerCoreData {
     func toTracker() -> Tracker? {

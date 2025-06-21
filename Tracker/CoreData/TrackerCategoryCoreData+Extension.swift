@@ -1,5 +1,4 @@
 import Foundation
-import CoreData
 
 extension TrackerCategoryCoreData {
     func toTrackerCategory() -> TrackerCategory? {
