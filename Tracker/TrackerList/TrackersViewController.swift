@@ -2,6 +2,7 @@
 import UIKit
 import SnapKit
 
+
 final class TrackersViewController: UIViewController {
     private var categories: [TrackerCategory] = []
     private var completedTrackers: [TrackerRecord] = []
@@ -23,6 +24,20 @@ final class TrackersViewController: UIViewController {
             return TrackerCategory(title: category.title, trackers: visibleTrackers)
         }.filter { !$0.trackers.isEmpty }
     }
+    //    private let trackerStore: TrackerStore = {
+    //        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    //        let context = appDelegate.persistentContainer.viewContext
+    //        return TrackerStore(context: context)
+    //    }()
+    private let trackerStore: TrackerStore = {
+        guard
+            let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        else {
+            fatalError("Unable to get AppDelegate or its persistentContainer")
+        }
+        let context = appDelegate.persistentContainer.viewContext
+        return TrackerStore(context: context)
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,6 +49,15 @@ final class TrackersViewController: UIViewController {
         collectionView.register(TrackersCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
         collectionView.register(CategoryHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header")
         updatePlaceholderVisibility()
+        categories = [
+            TrackerCategory(title: "Мои трекеры", trackers: trackerStore.fetchTrackers())
+        ]
+        trackerStore.delegate = self
+        let today = currentDate
+        if let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: today) {
+            currentDate = tomorrow
+            currentDate = today
+        }
     }
     
     private func setup() {
@@ -260,7 +284,8 @@ extension TrackersViewController: CreateHabitViewControllerDelegate {
                 title: oldCategory.title,
                 trackers: oldCategory.trackers + [tracker]
             )
-            categories[0] = updatedCategory
+            try? trackerStore.addNewTracker(tracker)
+            
         }
         collectionView.reloadData()
         updatePlaceholderVisibility()
@@ -269,19 +294,23 @@ extension TrackersViewController: CreateHabitViewControllerDelegate {
 
 extension TrackersViewController: IrregularEventViewControllerDelegate {
     func didCreatedIrregularevent(_ tracker: Tracker) {
-        if categories.isEmpty {
-            //             categories = [TrackerCategory(title: "Мои трекеры", trackers: [tracker])]
-            let defaultCategory = TrackerCategory(title: "Мои трекеры", trackers: [tracker])
-            categories.append(defaultCategory)
-        } else {
-            let oldCategory = categories[0]
-            let updatedCategory = TrackerCategory(
-                title: oldCategory.title,
-                trackers: oldCategory.trackers + [tracker]
-            )
-            categories[0] = updatedCategory
-        }
+        try? trackerStore.addNewTracker(tracker)
+        
+        categories = [
+            TrackerCategory(title: "Мои трекеры", trackers: trackerStore.fetchTrackers())
+        ]
         collectionView.reloadData()
         updatePlaceholderVisibility()
     }
 }
+
+extension TrackersViewController: TrackerStoreDelegate {
+    func trackerStoreDidUpdate() {
+        categories = [
+            TrackerCategory(title: "Мои трекеры", trackers: trackerStore.fetchTrackers())
+        ]
+        collectionView.reloadData()
+        updatePlaceholderVisibility()
+    }
+}
+

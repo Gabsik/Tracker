@@ -77,3 +77,10 @@ final class TrackerTypeSelectionViewController: UIViewController {
         present(navController, animated: true, completion: nil)
     }
 }
+
+extension TrackerTypeSelectionViewController: IrregularEventViewControllerDelegate {
+    func didCreatedIrregularevent(_ tracker: Tracker) {
+        delegate?.didCreatedIrregularevent(tracker) 
+        self.dismiss(animated: true)
+    }
+}
