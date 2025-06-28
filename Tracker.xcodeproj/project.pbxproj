@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0D6FEA872E1012BF00493E20 /* OnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D6FEA862E1012BF00493E20 /* OnboardingViewController.swift */; };
+		0D6FEA8A2E102FB800493E20 /* OnboardingPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D6FEA892E102FB700493E20 /* OnboardingPage.swift */; };
+		0D6FEA8C2E10314B00493E20 /* OnboardingPageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D6FEA8B2E10314B00493E20 /* OnboardingPageController.swift */; };
 		0D8920F52DEF6A63008EBD61 /* CategoryHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D8920F42DEF6A63008EBD61 /* CategoryHeaderView.swift */; };
 		0D8EFADB2DDE51FC00B3CB23 /* StatisticsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D8EFADA2DDE51FC00B3CB23 /* StatisticsViewController.swift */; };
 		0D8EFAE02DDF7A4A00B3CB23 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 0D8EFADF2DDF7A4A00B3CB23 /* SnapKit */; };
@@ -39,6 +42,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0D6FEA862E1012BF00493E20 /* OnboardingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewController.swift; sourceTree = "<group>"; };
+		0D6FEA892E102FB700493E20 /* OnboardingPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPage.swift; sourceTree = "<group>"; };
+		0D6FEA8B2E10314B00493E20 /* OnboardingPageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPageController.swift; sourceTree = "<group>"; };
 		0D8920F42DEF6A63008EBD61 /* CategoryHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryHeaderView.swift; sourceTree = "<group>"; };
 		0D8EFADA2DDE51FC00B3CB23 /* StatisticsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsViewController.swift; sourceTree = "<group>"; };
 		0D93BA172DFD94C90049BB05 /* TrackerDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TrackerDataModel.xcdatamodel; sourceTree = "<group>"; };
@@ -83,6 +89,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0D6FEA882E102F3000493E20 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				0D6FEA862E1012BF00493E20 /* OnboardingViewController.swift */,
+				0D6FEA892E102FB700493E20 /* OnboardingPage.swift */,
+				0D6FEA8B2E10314B00493E20 /* OnboardingPageController.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
 		0D93BA5D2E0088000049BB05 /* CoreData */ = {
 			isa = PBXGroup;
 			children = (
@@ -128,6 +144,7 @@
 				0DAF63CF2DF5A84300D1C7EA /* IrregularEventViewController */,
 				0DAF63C62DF476C900D1C7EA /* TrackerTypeSelection */,
 				0DAF63C52DF4768D00D1C7EA /* TrackerList */,
+				0D6FEA882E102F3000493E20 /* Onboarding */,
 				0D9C99A42DDCFF5500DF2CF3 /* Assets.xcassets */,
 				0D9C99A62DDCFF5500DF2CF3 /* LaunchScreen.storyboard */,
 				0D9C99A92DDCFF5500DF2CF3 /* Info.plist */,
@@ -291,11 +308,14 @@
 				0D9C999C2DDCFF4F00DF2CF3 /* AppDelegate.swift in Sources */,
 				0DAF63C42DF359C300D1C7EA /* ScheduleViewCell.swift in Sources */,
 				0D93BA5F2E00882A0049BB05 /* TrackerStore.swift in Sources */,
+				0D6FEA872E1012BF00493E20 /* OnboardingViewController.swift in Sources */,
 				0DEF87492E05EB2D00C815D2 /* TrackerRecordCoreData+Extension.swift in Sources */,
 				0D9C999E2DDCFF4F00DF2CF3 /* SceneDelegate.swift in Sources */,
+				0D6FEA8A2E102FB800493E20 /* OnboardingPage.swift in Sources */,
 				0DAF63CC2DF4A25100D1C7EA /* CreateHabitViewCollectionCell.swift in Sources */,
 				0DC7546F2DEC5A550009C845 /* TrackersCollectionViewCell.swift in Sources */,
 				0DEF874B2E05EBB000C815D2 /* UIColorMarshalling.swift in Sources */,
+				0D6FEA8C2E10314B00493E20 /* OnboardingPageController.swift in Sources */,
 				0DEF87452E05EA9400C815D2 /* TrackerCategoryCoreData+Extension.swift in Sources */,
 				0D8920F52DEF6A63008EBD61 /* CategoryHeaderView.swift in Sources */,
 				0D93BA632E0088840049BB05 /* TrackerRecordStore.swift in Sources */,
