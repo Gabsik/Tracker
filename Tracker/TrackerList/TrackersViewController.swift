@@ -39,6 +39,14 @@ final class TrackersViewController: UIViewController {
         return TrackerStore(context: context)
     }()
     
+    private let categoryStore: TrackerCategoryStore = {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            fatalError("Unable to get AppDelegate or its persistentContainer")
+        }
+        let context = appDelegate.persistentContainer.viewContext
+        return TrackerCategoryStore(context: context)
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
@@ -103,7 +111,7 @@ final class TrackersViewController: UIViewController {
     }
     
     @objc private func addButtonTapped() {
-        let trackerTypeSelectionVC = TrackerTypeSelectionViewController()
+        let trackerTypeSelectionVC = TrackerTypeSelectionViewController(categoryStore: categoryStore)
         trackerTypeSelectionVC.listVCDelegate = self
         trackerTypeSelectionVC.delegate = self
         trackerTypeSelectionVC.currentDate = self.currentDate
@@ -273,32 +281,63 @@ extension TrackersViewController: TrackersCollectionViewCellDelegate {
 }
 
 extension TrackersViewController: CreateHabitViewControllerDelegate {
-    func didCreateTracker(_ tracker: Tracker) {
-        if categories.isEmpty {
-            //             categories = [TrackerCategory(title: "Мои трекеры", trackers: [tracker])]
-            let defaultCategory = TrackerCategory(title: "Мои трекеры", trackers: [tracker])
-            categories.append(defaultCategory)
+//    func didCreateTracker(_ tracker: Tracker) {
+//        if categories.isEmpty {
+//            //             categories = [TrackerCategory(title: "Мои трекеры", trackers: [tracker])]
+//            let defaultCategory = TrackerCategory(title: "Мои трекеры", trackers: [tracker])
+//            categories.append(defaultCategory)
+//        } else {
+//            let oldCategory = categories[0]
+//            let updatedCategory = TrackerCategory(
+//                title: oldCategory.title,
+//                trackers: oldCategory.trackers + [tracker]
+//            )
+//            try? trackerStore.addNewTracker(tracker)
+//
+//        }
+//        collectionView.reloadData()
+//        updatePlaceholderVisibility()
+//    }
+    func didCreateTracker(_ tracker: Tracker, in category: TrackerCategory) {
+        try? trackerStore.addNewTracker(tracker)
+
+        // Добавляем в нужную категорию
+        if let index = categories.firstIndex(where: { $0.title == category.title }) {
+            let old = categories[index]
+            let updated = TrackerCategory(title: old.title, trackers: old.trackers + [tracker])
+            categories[index] = updated
         } else {
-            let oldCategory = categories[0]
-            let updatedCategory = TrackerCategory(
-                title: oldCategory.title,
-                trackers: oldCategory.trackers + [tracker]
-            )
-            try? trackerStore.addNewTracker(tracker)
-            
+            categories.append(TrackerCategory(title: category.title, trackers: [tracker]))
         }
+
         collectionView.reloadData()
         updatePlaceholderVisibility()
     }
 }
 
+//extension TrackersViewController: IrregularEventViewControllerDelegate {
+//    func didCreatedIrregularevent(_ tracker: Tracker) {
+//        try? trackerStore.addNewTracker(tracker)
+//
+//        categories = [
+//            TrackerCategory(title: "Мои трекеры", trackers: trackerStore.fetchTrackers())
+//        ]
+//        collectionView.reloadData()
+//        updatePlaceholderVisibility()
+//    }
+//}
+
 extension TrackersViewController: IrregularEventViewControllerDelegate {
-    func didCreatedIrregularevent(_ tracker: Tracker) {
+    func didCreatedIrregularevent(_ tracker: Tracker, in category: TrackerCategory) {
         try? trackerStore.addNewTracker(tracker)
         
-        categories = [
-            TrackerCategory(title: "Мои трекеры", trackers: trackerStore.fetchTrackers())
-        ]
+        if let index = categories.firstIndex(where: { $0.title == category.title }) {
+            let old = categories[index]
+            categories[index] = TrackerCategory(title: old.title, trackers: old.trackers + [tracker])
+        } else {
+            categories.append(TrackerCategory(title: category.title, trackers: [tracker]))
+        }
+        
         collectionView.reloadData()
         updatePlaceholderVisibility()
     }

@@ -4,7 +4,7 @@ import UIKit
 import SnapKit
 
 protocol CreateHabitViewControllerDelegate: AnyObject {
-    func didCreateTracker(_ tracker: Tracker)
+    func didCreateTracker(_ tracker: Tracker, in category: TrackerCategory)
 }
 
 final class CreateHabitViewController: UIViewController {
@@ -21,26 +21,34 @@ final class CreateHabitViewController: UIViewController {
     private let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: 50))
     private let collectionEmoji = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     private let collectionColor = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
-    
     private var selectedEmoji: String?
     private var selectedColor: UIColor?
-    
     private let cancelbutton = UIButton()
     private let createButton = UIButton()
-    
     private let stackView = UIStackView()
-    
     private let scrollView = UIScrollView()
     private let contentView = UIView()
-    
     weak var listVCDelegate: CreateHabitViewControllerDelegate?
-    
     private var schedule: [Weekday] = []
-    
     private let arryEmoji = [
         "🙂","😻","🌺","🐶","❤️","😱","😇","😡","🥶","🤔","🙌","🍔","🥦","🏓","🥇","🎸","🏝","😪"
     ]
     private let colorArray: [UIColor] = UIColor.trackersPalette
+    
+    private let categoryStore: TrackerCategoryStore
+    private var selectedCategory: TrackerCategory?
+    private let subtitlesCategoryLabel = UILabel()
+    
+    
+    
+    init(categoryStore: TrackerCategoryStore) {
+        self.categoryStore = categoryStore
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -92,6 +100,8 @@ final class CreateHabitViewController: UIViewController {
         categoryLabel.text = "Категория"
         categoryLabel.textColor = .blackCastom
         categoryArrow.image = UIImage(named: "chevron")
+        subtitlesCategoryLabel.textColor = .grayCastom
+        subtitlesCategoryLabel.font = UIFont.systemFont(ofSize: 17, weight: .regular)
         let tapGesturecategoryTapped = UITapGestureRecognizer(target: self, action: #selector(categoryTapped))
         categoryView.addGestureRecognizer(tapGesturecategoryTapped)
         
@@ -148,6 +158,8 @@ final class CreateHabitViewController: UIViewController {
         view.addSubview(stackView)
         stackView.addArrangedSubview(cancelbutton)
         stackView.addArrangedSubview(createButton)
+        categoryView.addSubview(subtitlesCategoryLabel)
+        
     }
     private func addConstraints() {
         scrollView.snp.makeConstraints { make in
@@ -230,11 +242,24 @@ final class CreateHabitViewController: UIViewController {
             make.top.equalTo(collectionEmoji.snp.bottom).offset(32)
             make.height.equalTo(222)
             make.bottom.equalTo(contentView.snp.bottom).offset(-16)
-            
+        }
+        subtitlesCategoryLabel.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(16)
+            make.top.equalTo(categoryLabel.snp.bottom).offset(2)
         }
     }
     @objc private func categoryTapped() {
-        print("Категория нажата!")
+        let viewModel = CategoriesViewModel(categoryStore: categoryStore)
+        let categoriesVC = CategoriesViewController(viewModel: viewModel)
+        
+        categoriesVC.onCategorySelected = { [weak self] selected in
+            self?.selectedCategory = selected
+            self?.subtitlesCategoryLabel.text = selected.title
+            self?.updateCreateButtonState()
+        }
+        
+        let navVC = UINavigationController(rootViewController: categoriesVC)
+        present(navVC, animated: true)
     }
     
     @objc private func scheduleTapped() {
@@ -274,6 +299,13 @@ final class CreateHabitViewController: UIViewController {
             return
         }
         
+        guard let selectedCategory = selectedCategory else {
+            let alert = UIAlertController(title: "Ошибка", message: "Выберите категорию.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Ок", style: .default))
+            present(alert, animated: true)
+            return
+        }
+        
         let newTracker = Tracker(
             id: UUID(),
             title: title,
@@ -283,7 +315,8 @@ final class CreateHabitViewController: UIViewController {
             createdAt: Date()
         )
         
-        listVCDelegate?.didCreateTracker(newTracker)
+        listVCDelegate?.didCreateTracker(newTracker, in: selectedCategory)
+        
         dismiss(animated: true, completion: nil)
     }
     @objc private func textFieldDidChange() {

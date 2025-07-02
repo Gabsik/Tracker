@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0D5419232E158CDF0017E276 /* CategoriesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D5419212E158CDF0017E276 /* CategoriesViewController.swift */; };
+		0D5419242E158CDF0017E276 /* AddCategoriesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D5419222E158CDF0017E276 /* AddCategoriesViewController.swift */; };
+		0D5419262E15A81D0017E276 /* CategoryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D5419252E15A81C0017E276 /* CategoryCell.swift */; };
+		0D5419282E15B57C0017E276 /* CategoriesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D5419272E15B57C0017E276 /* CategoriesViewModel.swift */; };
 		0D6FEA872E1012BF00493E20 /* OnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D6FEA862E1012BF00493E20 /* OnboardingViewController.swift */; };
 		0D6FEA8A2E102FB800493E20 /* OnboardingPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D6FEA892E102FB700493E20 /* OnboardingPage.swift */; };
 		0D6FEA8C2E10314B00493E20 /* OnboardingPageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D6FEA8B2E10314B00493E20 /* OnboardingPageController.swift */; };
@@ -42,6 +46,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0D5419212E158CDF0017E276 /* CategoriesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoriesViewController.swift; sourceTree = "<group>"; };
+		0D5419222E158CDF0017E276 /* AddCategoriesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddCategoriesViewController.swift; sourceTree = "<group>"; };
+		0D5419252E15A81C0017E276 /* CategoryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryCell.swift; sourceTree = "<group>"; };
+		0D5419272E15B57C0017E276 /* CategoriesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesViewModel.swift; sourceTree = "<group>"; };
 		0D6FEA862E1012BF00493E20 /* OnboardingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewController.swift; sourceTree = "<group>"; };
 		0D6FEA892E102FB700493E20 /* OnboardingPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPage.swift; sourceTree = "<group>"; };
 		0D6FEA8B2E10314B00493E20 /* OnboardingPageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPageController.swift; sourceTree = "<group>"; };
@@ -148,6 +156,10 @@
 				0D9C99A42DDCFF5500DF2CF3 /* Assets.xcassets */,
 				0D9C99A62DDCFF5500DF2CF3 /* LaunchScreen.storyboard */,
 				0D9C99A92DDCFF5500DF2CF3 /* Info.plist */,
+				0D5419222E158CDF0017E276 /* AddCategoriesViewController.swift */,
+				0D5419212E158CDF0017E276 /* CategoriesViewController.swift */,
+				0D5419252E15A81C0017E276 /* CategoryCell.swift */,
+				0D5419272E15B57C0017E276 /* CategoriesViewModel.swift */,
 			);
 			path = Tracker;
 			sourceTree = "<group>";
@@ -302,11 +314,15 @@
 				0DBEA38F2DF8AEBA00F18614 /* ColorCollectionCell.swift in Sources */,
 				0DF51EA62DE61776001C5745 /* TrackerRecord.swift in Sources */,
 				0DF51EA72DE61777001C5745 /* Tracker.swift in Sources */,
+				0D5419282E15B57C0017E276 /* CategoriesViewModel.swift in Sources */,
 				0DAF63CE2DF5A83100D1C7EA /* IrregularEventViewController.swift in Sources */,
+				0D5419262E15A81D0017E276 /* CategoryCell.swift in Sources */,
 				0DBEA3872DF76A9500F18614 /* HeaderReusableView.swift in Sources */,
 				0DAF63BE2DEF845C00D1C7EA /* TrackerTypeSelectionViewController.swift in Sources */,
 				0D9C999C2DDCFF4F00DF2CF3 /* AppDelegate.swift in Sources */,
+				0D5419232E158CDF0017E276 /* CategoriesViewController.swift in Sources */,
 				0DAF63C42DF359C300D1C7EA /* ScheduleViewCell.swift in Sources */,
+				0D5419242E158CDF0017E276 /* AddCategoriesViewController.swift in Sources */,
 				0D93BA5F2E00882A0049BB05 /* TrackerStore.swift in Sources */,
 				0D6FEA872E1012BF00493E20 /* OnboardingViewController.swift in Sources */,
 				0DEF87492E05EB2D00C815D2 /* TrackerRecordCoreData+Extension.swift in Sources */,
