@@ -9,6 +9,16 @@ final class TrackerTypeSelectionViewController: UIViewController {
     weak var listVCDelegate: CreateHabitViewControllerDelegate?
     weak var delegate: IrregularEventViewControllerDelegate?
     var currentDate: Date!
+    private let categoryStore: TrackerCategoryStore
+
+    init(categoryStore: TrackerCategoryStore) {
+            self.categoryStore = categoryStore
+            super.init(nibName: nil, bundle: nil)
+        }
+
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -63,14 +73,15 @@ final class TrackerTypeSelectionViewController: UIViewController {
     }
     
     @objc private func addHabitButtonTapped() {
-        let createHabitVC = CreateHabitViewController()
+        let createHabitVC = CreateHabitViewController(categoryStore: categoryStore)
         createHabitVC.listVCDelegate = listVCDelegate
         let navController = UINavigationController(rootViewController: createHabitVC )
         present(navController, animated: true, completion: nil)
     }
     
     @objc private func addirregularEventButtonTapped() {
-        let irregularEventVC = IrregularEventViewController()
+        let viewModel = CategoriesViewModel(categoryStore: categoryStore)
+        let irregularEventVC = IrregularEventViewController(viewModel: viewModel)
         irregularEventVC.delegate = delegate
         irregularEventVC.trackerDate = currentDate
         let navController = UINavigationController(rootViewController: irregularEventVC)
@@ -79,8 +90,12 @@ final class TrackerTypeSelectionViewController: UIViewController {
 }
 
 extension TrackerTypeSelectionViewController: IrregularEventViewControllerDelegate {
-    func didCreatedIrregularevent(_ tracker: Tracker) {
-        delegate?.didCreatedIrregularevent(tracker) 
+//    func didCreatedIrregularevent(_ tracker: Tracker) {
+//        delegate?.didCreatedIrregularevent(tracker)
+//        self.dismiss(animated: true)
+//    }
+    func didCreatedIrregularevent(_ tracker: Tracker, in category: TrackerCategory) {
+        delegate?.didCreatedIrregularevent(tracker, in: category)
         self.dismiss(animated: true)
     }
 }

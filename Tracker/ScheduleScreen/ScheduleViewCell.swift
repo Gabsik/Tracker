@@ -54,7 +54,6 @@ final class ScheduleViewCell: UITableViewCell {
             make.top.equalToSuperview().inset(22)
         }
         customSeparator.snp.makeConstraints { make in
-//            make.height.equalTo(1)
             make.leading.equalToSuperview().offset(16)
             make.trailing.equalToSuperview().inset(16)
             make.bottom.equalToSuperview()

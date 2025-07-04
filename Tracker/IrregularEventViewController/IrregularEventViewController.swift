@@ -3,10 +3,10 @@ import SnapKit
 import UIKit
 
 protocol IrregularEventViewControllerDelegate: AnyObject {
-    func didCreatedIrregularevent(_ tracker: Tracker)
+    func didCreatedIrregularevent(_ tracker: Tracker, in category: TrackerCategory)
 }
 
-class IrregularEventViewController: UIViewController {
+final class IrregularEventViewController: UIViewController {
     private let irregularEventTextField = UITextField()
     private let categoryView = UIView()
     private let categoryLabel = UILabel()
@@ -16,8 +16,21 @@ class IrregularEventViewController: UIViewController {
     private let createButton = UIButton()
     private let stackView = UIStackView()
     var trackerDate: Date = Date()
+    private var selectedCategory: TrackerCategory?
+    private let subtitlesCategoryLabel = UILabel()
     
     weak var delegate: IrregularEventViewControllerDelegate?
+    
+    private let viewModel: CategoriesViewModel
+    
+    init(viewModel: CategoriesViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -51,6 +64,8 @@ class IrregularEventViewController: UIViewController {
         categoryView.backgroundColor = .background
         categoryView.layer.cornerRadius = 16
         categoryView.clipsToBounds = true
+        subtitlesCategoryLabel.textColor = .grayCastom
+        subtitlesCategoryLabel.font = UIFont.systemFont(ofSize: 17, weight: .regular)
         
         //MARK: setting buttonCancel
         cancelbutton.setTitle("Отменить", for: .normal)
@@ -85,6 +100,8 @@ class IrregularEventViewController: UIViewController {
         view.addSubview(stackView)
         stackView.addArrangedSubview(cancelbutton)
         stackView.addArrangedSubview(createButton)
+        categoryView.addSubview(subtitlesCategoryLabel)
+        
     }
     private func addConstraints() {
         irregularEventTextField.snp.makeConstraints { make in
@@ -114,15 +131,36 @@ class IrregularEventViewController: UIViewController {
             make.bottom.equalTo(view.safeAreaLayoutGuide).offset(0)
             make.height.equalTo(60)
         }
+        subtitlesCategoryLabel.snp.makeConstraints { make in
+            make.top.equalTo(categoryLabel.snp.bottom).offset(2)
+            make.leading.equalToSuperview().offset(16)
+        }
     }
     @objc private func categoryTapped() {
         print("Категория нажата!")
+        let categoriesVC = CategoriesViewController(viewModel: viewModel)
+        
+        categoriesVC.onCategorySelected = { [weak self] category in
+            self?.selectedCategory = category
+            self?.categoryLabel.text = "Категория"
+            self?.subtitlesCategoryLabel.text = category.title
+            self?.updateCreateButtonState()
+        }
+        
+        let nav = UINavigationController(rootViewController: categoriesVC)
+        present(nav, animated: true)
     }
     @objc private func cancelTapped() {
         dismiss(animated: true, completion: nil)
     }
     @objc private func createTapped() {
         guard let title = irregularEventTextField.text, !title.isEmpty else {
+            return
+        }
+        guard let category = selectedCategory else {
+            let alert = UIAlertController(title: "Ошибка", message: "Выберите категорию.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Ок", style: .default))
+            present(alert, animated: true)
             return
         }
         let newTracker = Tracker(
@@ -133,7 +171,7 @@ class IrregularEventViewController: UIViewController {
             schedule: nil,
             createdAt: trackerDate
         )
-        delegate?.didCreatedIrregularevent(newTracker)
+        delegate?.didCreatedIrregularevent(newTracker, in: category)
         dismiss(animated: true, completion: nil)
     }
     @objc private func textFieldDidChange() {
