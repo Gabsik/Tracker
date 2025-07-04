@@ -4,11 +4,11 @@
 import Foundation
 
 final class CategoriesViewModel {
-     let categoryStore: TrackerCategoryStore
-
+    let categoryStore: TrackerCategoryStore
+    
     var onCategoriesChanged: (() -> Void)?
     var onCategorySelected: ((TrackerCategory) -> Void)?
-
+    
     private(set) var categories: [TrackerCategory] = [] {
         didSet { onCategoriesChanged?() }
     }
@@ -16,17 +16,17 @@ final class CategoriesViewModel {
     private(set) var selectedIndex: Int? {
         didSet { onCategoriesChanged?() }
     }
-
+    
     init(categoryStore: TrackerCategoryStore) {
         self.categoryStore = categoryStore
         self.categoryStore.delegate = self
         fetchCategories()
     }
-
+    
     func fetchCategories() {
         categories = categoryStore.fetchCategories()
     }
-
+    
     func addNewCategory(title: String) {
         do {
             try categoryStore.addNewCategory(title: title)
@@ -34,27 +34,27 @@ final class CategoriesViewModel {
             print("Ошибка добавления категории: \(error)")
         }
     }
-
+    
     func selectCategory(at index: Int) {
         guard index < categories.count else { return }
         selectedIndex = index
         onCategorySelected?(categories[index])
     }
-
+    
     func category(at index: Int) -> TrackerCategory {
-        return categories[index]
+        categories[index]
     }
-
+    
     func isSelected(at index: Int) -> Bool {
-        return index == selectedIndex
+        index == selectedIndex
     }
-
+    
     var isEmpty: Bool {
-        return categories.isEmpty
+        categories.isEmpty
     }
-
+    
     var numberOfCategories: Int {
-        return categories.count
+        categories.count
     }
 }
 

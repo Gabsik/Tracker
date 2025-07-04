@@ -6,7 +6,7 @@ protocol IrregularEventViewControllerDelegate: AnyObject {
     func didCreatedIrregularevent(_ tracker: Tracker, in category: TrackerCategory)
 }
 
-class IrregularEventViewController: UIViewController {
+final class IrregularEventViewController: UIViewController {
     private let irregularEventTextField = UITextField()
     private let categoryView = UIView()
     private let categoryLabel = UILabel()

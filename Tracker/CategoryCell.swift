@@ -66,8 +66,8 @@ final class CategoryCell: UITableViewCell {
     
     func roundCorners(top: Bool, bottom: Bool) {
         let radius: CGFloat = 16
-        self.layer.cornerRadius = radius
-        self.layer.masksToBounds = true
+        layer.cornerRadius = radius
+        layer.masksToBounds = true
 
         var corners: CACornerMask = []
         if top {
