@@ -107,7 +107,10 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
         self.tracker = tracker
         nameLabel.text = tracker.title
         titleEmojiesLabel.text = tracker.emoji
-        numberDaysLabel.text = "\(daysCount) дней"
+        numberDaysLabel.text = String.localizedStringWithFormat(
+            NSLocalizedString("numberOfDays", comment: "дней"),
+            daysCount
+        )
         containerView.backgroundColor = tracker.color
         
         let imageName = isCompletedToday ? "Property" : "checkMarkButton"
@@ -127,7 +130,6 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
             let checkmarkImage = UIImage(named: "checkMarkButton")?.withRenderingMode(.alwaysTemplate)
             checkMarkButton.setImage(checkmarkImage, for: .normal)
             checkMarkButton.tintColor = tracker.color
-            //            checkMarkButton.backgroundColor = .clear
             overlayImageView.isHidden = true
         }
         checkMarkButton.layer.masksToBounds = true
@@ -142,7 +144,10 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
     func update(isCompletedToday: Bool, daysCount: Int) {
         self.isCompletedToday = isCompletedToday
         self.daysCount = daysCount
-        numberDaysLabel.text = "\(daysCount) дней"
+        numberDaysLabel.text = String.localizedStringWithFormat(
+            NSLocalizedString("numberOfDays", comment: "дней"),
+            daysCount
+        )
         
         if isCompletedToday {
             let baseImage = UIImage(named: "Property")?.withRenderingMode(.alwaysTemplate)

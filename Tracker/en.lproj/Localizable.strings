@@ -1,0 +1,9 @@
+/* 
+  Localizable.strings
+  Tracker
+
+  Created by Ленар Габсалямов on 07.07.2025.
+  
+*/
+
+"numberOfDays" = "%#@days@";

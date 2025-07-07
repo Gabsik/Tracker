@@ -24,11 +24,6 @@ final class TrackersViewController: UIViewController {
             return TrackerCategory(title: category.title, trackers: visibleTrackers)
         }.filter { !$0.trackers.isEmpty }
     }
-    //    private let trackerStore: TrackerStore = {
-    //        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-    //        let context = appDelegate.persistentContainer.viewContext
-    //        return TrackerStore(context: context)
-    //    }()
     private let trackerStore: TrackerStore = {
         guard
             let appDelegate = UIApplication.shared.delegate as? AppDelegate
@@ -284,7 +279,6 @@ extension TrackersViewController: CreateHabitViewControllerDelegate {
     func didCreateTracker(_ tracker: Tracker, in category: TrackerCategory) {
         try? trackerStore.addNewTracker(tracker)
 
-        // Добавляем в нужную категорию
         if let index = categories.firstIndex(where: { $0.title == category.title }) {
             let old = categories[index]
             let updated = TrackerCategory(title: old.title, trackers: old.trackers + [tracker])
