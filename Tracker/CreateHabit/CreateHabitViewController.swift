@@ -76,11 +76,12 @@ final class CreateHabitViewController: UIViewController {
     
     private func setup() {
         view.backgroundColor = .white
-        title = "Новая привычка"
+        title = NSLocalizedString("new_habit", comment: "")
     }
     private func settingUI() {
         //MARK: setting habitNameTextField
-        habitNameTextField.placeholder = "Ведите название трекера"
+//        habitNameTextField.placeholder = "Ведите название трекера"
+        habitNameTextField.placeholder = NSLocalizedString("enter_tracker_name", comment: "")
         habitNameTextField.layer.cornerRadius = 16
         habitNameTextField.backgroundColor = .background
         habitNameTextField.borderStyle = .none
@@ -97,7 +98,8 @@ final class CreateHabitViewController: UIViewController {
         containerView.clipsToBounds = true
         
         //MARK: setting category
-        categoryLabel.text = "Категория"
+//        categoryLabel.text = "Категория"
+        categoryLabel.text = NSLocalizedString("category", comment: "")
         categoryLabel.textColor = .blackCastom
         categoryArrow.image = UIImage(named: "chevron")
         subtitlesCategoryLabel.textColor = .grayCastom
@@ -106,7 +108,8 @@ final class CreateHabitViewController: UIViewController {
         categoryView.addGestureRecognizer(tapGesturecategoryTapped)
         
         //MARK: setting schedule
-        scheduleLabel.text = "Расписание"
+//        scheduleLabel.text = "Расписание"
+        scheduleLabel.text = NSLocalizedString("schedule", comment: "")
         scheduleLabel.textColor = .blackCastom
         scheduleLabel.font = UIFont.systemFont(ofSize: 17, weight: .regular)
         scheduleArrow.image = UIImage(named: "chevron")
@@ -122,7 +125,8 @@ final class CreateHabitViewController: UIViewController {
         stackView.distribution = .fillEqually
         
         //MARK: setting buttonCancel
-        cancelbutton.setTitle("Отменить", for: .normal)
+//        cancelbutton.setTitle("Отменить", for: .normal)
+        cancelbutton.setTitle(NSLocalizedString("cancel", comment: ""), for: .normal)
         cancelbutton.setTitleColor(.redCastom, for: .normal)
         cancelbutton.backgroundColor = .white
         cancelbutton.layer.borderWidth = 1
@@ -131,7 +135,8 @@ final class CreateHabitViewController: UIViewController {
         cancelbutton.addTarget(self, action: #selector(cancelTapped), for: .touchUpInside)
         
         //MARK: setting createButton
-        createButton.setTitle("Создать", for: .normal)
+//        createButton.setTitle("Создать", for: .normal)
+        createButton.setTitle(NSLocalizedString("create", comment: ""), for: .normal)
         createButton.setTitleColor(.white, for: .normal)
         createButton.backgroundColor = .grayCastom
         createButton.layer.cornerRadius = 16
@@ -278,8 +283,8 @@ final class CreateHabitViewController: UIViewController {
         }
         guard !schedule.isEmpty else {
             let alert = UIAlertController(
-                title: "Ошибка",
-                message: "Пожалуйста, выберите хотя бы один день для расписания.",
+                title: NSLocalizedString("error", comment: ""),
+                message: NSLocalizedString("schedule_error", comment: ""),
                 preferredStyle: .alert
             )
             alert.addAction(UIAlertAction(title: "Ок", style: .default, handler: nil))
@@ -401,9 +406,11 @@ extension CreateHabitViewController: UICollectionViewDelegateFlowLayout {
                                                                      withReuseIdentifier: "header",
                                                                      for: indexPath) as! HeaderReusableView
         if collectionView == collectionEmoji {
-            header.titleLabel.text = "Emoji"
+//            header.titleLabel.text = "Emoji"
+            header.titleLabel.text = NSLocalizedString("emoji", comment: "")
         } else if collectionView == collectionColor {
-            header.titleLabel.text = "Цвета"
+//            header.titleLabel.text = "Цвета"
+            header.titleLabel.text = NSLocalizedString("colors", comment: "")
         }
         return header
     }

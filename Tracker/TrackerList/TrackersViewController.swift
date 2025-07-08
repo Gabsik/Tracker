@@ -52,9 +52,11 @@ final class TrackersViewController: UIViewController {
         collectionView.register(TrackersCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
         collectionView.register(CategoryHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header")
         updatePlaceholderVisibility()
-        categories = [
-            TrackerCategory(title: "Мои трекеры", trackers: trackerStore.fetchTrackers())
-        ]
+        categories = categoryStore.fetchCategories()
+
+//        categories = [
+//            TrackerCategory(title: "Мои трекеры", trackers: trackerStore.fetchTrackers())
+//        ]
         trackerStore.delegate = self
         let today = currentDate
         if let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: today) {
@@ -72,7 +74,7 @@ final class TrackersViewController: UIViewController {
         navigationItem.leftBarButtonItem = addButton
         
         //MARK: setting title
-        title = "Трекеры"
+        title = NSLocalizedString("trackers_title", comment: "Заголовок экрана")
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .always
         
@@ -80,7 +82,7 @@ final class TrackersViewController: UIViewController {
         let searchController = UISearchController(searchResultsController: nil)
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.hidesNavigationBarDuringPresentation = false
-        searchController.searchBar.placeholder = "Поиск"
+        searchController.searchBar.placeholder = NSLocalizedString("search_placeholder", comment: "Плейсхолдер в поиске")
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = false
         
@@ -96,7 +98,7 @@ final class TrackersViewController: UIViewController {
         placeholderImageView.contentMode = .scaleAspectFit
         
         //MARK: setting placeholderLabel
-        placeholderLabel.text = "Что будем отслеживать?"
+        placeholderLabel.text = NSLocalizedString("placeholder_text", comment: "Плейсхолдер, если нет трекеров")
         placeholderLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         placeholderLabel.textColor = .blackCastom
         placeholderLabel.textAlignment = .center
@@ -310,9 +312,10 @@ extension TrackersViewController: IrregularEventViewControllerDelegate {
 
 extension TrackersViewController: TrackerStoreDelegate {
     func trackerStoreDidUpdate() {
-        categories = [
-            TrackerCategory(title: "Мои трекеры", trackers: trackerStore.fetchTrackers())
-        ]
+//        categories = [
+//            TrackerCategory(title: "Мои трекеры", trackers: trackerStore.fetchTrackers())
+//        ]
+        categories = categoryStore.fetchCategories()
         collectionView.reloadData()
         updatePlaceholderVisibility()
     }

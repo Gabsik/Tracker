@@ -1,0 +1,60 @@
+
+/* Главный заголовок на экране трекеров */
+"trackers_title" = "Трекеры";
+
+/* Плейсхолдер, когда трекеров нет */
+"placeholder_text" = "Что будем отслеживать?";
+
+/* Плейсхолдер в поиске */
+"search_placeholder" = "Поиск";
+
+//CategoriesViewController
+"categoryTitle" = "Категория";
+"addCategoryButtonTitle" = "Добавить категорию";
+"categoryPlaceholder" = "Привычки и события можно объединить по смыслу";
+
+//AddCategoriesViewController
+"newCategoryTitle" = "Новая категория";
+"enterCategoryPlaceholder" = "Введите название категории";
+"doneButtonTitle" = "Готово";
+
+//OnboardingPageController
+"onboardingPage1Title" = "Отслеживайте только то, что хотите";
+"onboardingPage2Title" = "Даже если это не литры воды и йога";
+"onboardingContinueButton" = "Вот это технологии!";
+
+/* TrackerTypeSelectionViewController */
+"create_tracker" = "Создание трекера";
+"habit" = "Привычка";
+"irregular_event" = "Нерегулярное Событие";
+
+/* IrregularEventViewController */
+"new_irregular_event" = "Новое нерегулярное событие";
+"enter_tracker_name" = "Ведите название трекера";
+"category" = "Категория";
+"cancel" = "Отменить";
+"create" = "Создать";
+"error" = "Ошибка";
+"select_category" = "Выберите категорию.";
+
+/* CreateHabitViewController */
+"new_habit" = "Новая привычка";
+"schedule" = "Расписание";
+"schedule_error" = "Пожалуйста, выберите хотя бы один день для расписания.";
+"select_emoji" = "Пожалуйста, выберите эмоджи.";
+"select_color" = "Пожалуйста, выберите цвет.";
+"emoji" = "Emoji";
+"colors" = "Цвета";
+
+/* ScheduleViewController */
+"schedule_title" = "Расписание";
+"done" = "Готово";
+
+/* Weekdays  */
+"monday" = "Понедельник";
+"tuesday" = "Вторник";
+"wednesday" = "Среда";
+"thursday" = "Четверг";
+"friday" = "Пятница";
+"saturday" = "Суббота";
+"sunday" = "Воскресенье";
