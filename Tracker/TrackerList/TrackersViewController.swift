@@ -2,9 +2,9 @@
 import UIKit
 import SnapKit
 
-
 final class TrackersViewController: UIViewController {
     private var categories: [TrackerCategory] = []
+    private var filteredCategories: [TrackerCategory] = []
     private var completedTrackers: [TrackerRecord] = []
     private var completedTrackerIDs: Set<UUID> = []
     private let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
@@ -18,12 +18,7 @@ final class TrackersViewController: UIViewController {
             updatePlaceholderVisibility()
         }
     }
-    private var visibleCategories: [TrackerCategory] {
-        categories.map { category in
-            let visibleTrackers = category.trackers.filter { isTrackerVisible($0) }
-            return TrackerCategory(title: category.title, trackers: visibleTrackers)
-        }.filter { !$0.trackers.isEmpty }
-    }
+    private var visibleCategories: [TrackerCategory] = []
     private let trackerStore: TrackerStore = {
         guard
             let appDelegate = UIApplication.shared.delegate as? AppDelegate
@@ -53,16 +48,13 @@ final class TrackersViewController: UIViewController {
         collectionView.register(CategoryHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header")
         updatePlaceholderVisibility()
         categories = categoryStore.fetchCategories()
-
-//        categories = [
-//            TrackerCategory(title: "Мои трекеры", trackers: trackerStore.fetchTrackers())
-//        ]
         trackerStore.delegate = self
         let today = currentDate
         if let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: today) {
             currentDate = tomorrow
             currentDate = today
         }
+        updateVisibleCategories()
     }
     
     private func setup() {
@@ -85,6 +77,7 @@ final class TrackersViewController: UIViewController {
         searchController.searchBar.placeholder = NSLocalizedString("search_placeholder", comment: "Плейсхолдер в поиске")
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = false
+        searchController.searchResultsUpdater = self
         
         //MARK: setting datePicker
         datePicker.datePickerMode = .date
@@ -118,6 +111,7 @@ final class TrackersViewController: UIViewController {
     
     @objc private func dateChanged(_ sender: UIDatePicker) {
         currentDate = sender.date
+        updateVisibleCategories(with: navigationItem.searchController?.searchBar.text ?? "")
     }
     
     private func addView() {
@@ -149,7 +143,6 @@ final class TrackersViewController: UIViewController {
     }
     private func isTrackerVisible(_ tracker: Tracker) -> Bool {
         if let schedule = tracker.schedule {
-            // Привычка по расписанию
             let weekday = weekdayFromDate(currentDate)
             return schedule.contains(weekday)
         }
@@ -219,6 +212,24 @@ final class TrackersViewController: UIViewController {
         placeholderImageView.isHidden = !isEmpty
         placeholderLabel.isHidden = !isEmpty
     }
+    private func updateVisibleCategories(with searchText: String = "") {
+        if searchText.isEmpty {
+            visibleCategories = categories.map { category in
+                let visibleTrackers = category.trackers.filter { isTrackerVisible($0) }
+                return TrackerCategory(title: category.title, trackers: visibleTrackers)
+            }.filter { !$0.trackers.isEmpty }
+        } else {
+            visibleCategories = categories.compactMap { category in
+                let matchingTrackers = category.trackers.filter {
+                    isTrackerVisible($0) && $0.title.lowercased().contains(searchText.lowercased())
+                }
+                return matchingTrackers.isEmpty ? nil : TrackerCategory(title: category.title, trackers: matchingTrackers)
+            }
+        }
+        
+        collectionView.reloadData()
+        updatePlaceholderVisibility()
+    }
 }
 
 extension TrackersViewController: UICollectionViewDataSource {
@@ -280,7 +291,7 @@ extension TrackersViewController: TrackersCollectionViewCellDelegate {
 extension TrackersViewController: CreateHabitViewControllerDelegate {
     func didCreateTracker(_ tracker: Tracker, in category: TrackerCategory) {
         try? trackerStore.addNewTracker(tracker)
-
+        
         if let index = categories.firstIndex(where: { $0.title == category.title }) {
             let old = categories[index]
             let updated = TrackerCategory(title: old.title, trackers: old.trackers + [tracker])
@@ -288,7 +299,7 @@ extension TrackersViewController: CreateHabitViewControllerDelegate {
         } else {
             categories.append(TrackerCategory(title: category.title, trackers: [tracker]))
         }
-
+        
         collectionView.reloadData()
         updatePlaceholderVisibility()
     }
@@ -312,12 +323,14 @@ extension TrackersViewController: IrregularEventViewControllerDelegate {
 
 extension TrackersViewController: TrackerStoreDelegate {
     func trackerStoreDidUpdate() {
-//        categories = [
-//            TrackerCategory(title: "Мои трекеры", trackers: trackerStore.fetchTrackers())
-//        ]
         categories = categoryStore.fetchCategories()
-        collectionView.reloadData()
-        updatePlaceholderVisibility()
+        updateVisibleCategories(with: navigationItem.searchController?.searchBar.text ?? "")
+    }
+}
+
+extension TrackersViewController: UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
+        updateVisibleCategories(with: searchController.searchBar.text ?? "")
     }
 }
 
