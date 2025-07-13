@@ -29,15 +29,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow?
     let tabBarController = UITabBarController()
-    //    let viewController = ViewController()
-    //    let statisticsViewController = StatisticsViewController()
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         window = UIWindow()
-        
-        //        tabBarController.setViewControllers([viewController, statisticsViewController], animated: true)
-        
         window?.rootViewController = tabBarController
         window?.makeKeyAndVisible()
         return true

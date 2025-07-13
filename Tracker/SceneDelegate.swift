@@ -5,6 +5,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     var window: UIWindow?
     let tabBarController = UITabBarController()
+    private let colors = Colors()
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         
@@ -19,10 +20,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let statisticsNavigationVC = UINavigationController(rootViewController: statisticsVC )
         
         tabBarController.setViewControllers([trackersNavigationVC, statisticsNavigationVC], animated: true)
-        
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = .white
+        appearance.backgroundColor = colors.viewBackgroundColor
         appearance.shadowColor = .lightGray
         
         tabBarController.tabBar.standardAppearance = appearance

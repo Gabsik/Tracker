@@ -11,6 +11,7 @@ final class TrackersViewController: UIViewController {
     private let placeholderImageView = UIImageView()
     private let placeholderLabel = UILabel()
     private let datePicker = UIDatePicker()
+    private let colors = Colors()
     private var currentDate: Date = Date() {
         didSet {
             updateCompletedTrackerIDs()
@@ -58,11 +59,12 @@ final class TrackersViewController: UIViewController {
     }
     
     private func setup() {
-        view.backgroundColor = .white
+        view.backgroundColor = colors.viewBackgroundColor
     }
     private func setupTopNavigationBar() {
         let image = UIImage(named: "plusButton")
         let addButton = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(addButtonTapped))
+        addButton.tintColor = colors.navigationBarButtonColor
         navigationItem.leftBarButtonItem = addButton
         
         //MARK: setting title
@@ -85,6 +87,10 @@ final class TrackersViewController: UIViewController {
         datePicker.locale = Locale(identifier: "ru_RU")
         datePicker.addTarget(self, action: #selector(dateChanged(_:)), for: .valueChanged)
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: datePicker)
+        datePicker.backgroundColor = colors.datePickerBackgroundColor
+        updateDatePickerTextColor(datePicker)
+        datePicker.layer.cornerRadius = 8
+        datePicker.layer.masksToBounds = true
         
         //MARK: setting placeholderImageView
         placeholderImageView.image = UIImage(named: "placeholder")
@@ -215,20 +221,36 @@ final class TrackersViewController: UIViewController {
     private func updateVisibleCategories(with searchText: String = "") {
         if searchText.isEmpty {
             visibleCategories = categories.map { category in
-                let visibleTrackers = category.trackers.filter { isTrackerVisible($0) }
+                let visibleTrackers = category.trackers
+                    .filter { isTrackerVisible($0) }
+                    .sorted { $0.title < $1.title }
                 return TrackerCategory(title: category.title, trackers: visibleTrackers)
             }.filter { !$0.trackers.isEmpty }
         } else {
             visibleCategories = categories.compactMap { category in
-                let matchingTrackers = category.trackers.filter {
-                    isTrackerVisible($0) && $0.title.lowercased().contains(searchText.lowercased())
-                }
+                let matchingTrackers = category.trackers
+                    .filter { isTrackerVisible($0) && $0.title.lowercased().contains(searchText.lowercased()) }
+                    .sorted { $0.title < $1.title }
                 return matchingTrackers.isEmpty ? nil : TrackerCategory(title: category.title, trackers: matchingTrackers)
             }
         }
         
         collectionView.reloadData()
         updatePlaceholderVisibility()
+    }
+    
+    func updateDatePickerTextColor(_ view: UIView) {
+        for subview in view.subviews {
+            if let label = subview as? UILabel {
+                label.textColor = UIColor { trait in
+                    switch trait.userInterfaceStyle {
+                    case .dark: return .black
+                    default: return .label
+                    }
+                }
+            }
+            updateDatePickerTextColor(subview)
+        }
     }
 }
 
@@ -269,6 +291,7 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
         
         return header
     }
+    
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         referenceSizeForHeaderInSection section: Int) -> CGSize {
@@ -279,18 +302,64 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
 extension TrackersViewController: TrackersCollectionViewCellDelegate {
     func trackersCollectionViewCellDidTapCheckMark(_ cell: TrackersCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
-        let tracker = categories[indexPath.section].trackers.filter { isTrackerVisible($0) }[indexPath.item]
+        let tracker = visibleCategories[indexPath.section].trackers[indexPath.item]
         if currentDate > Date() { return }
         toggleCompletion(for: tracker)
         let isCompleted = completedTrackerIDs.contains(tracker.id)
         let daysCount = getDaysCount(for: tracker)
         cell.update(isCompletedToday: isCompleted, daysCount: daysCount)
     }
+    
+    func trackersCollectionViewCellDidRequestDelete(_ cell: TrackersCollectionViewCell) {
+        guard let indexPath = collectionView.indexPath(for: cell) else { return }
+        let tracker = visibleCategories[indexPath.section].trackers[indexPath.item]
+        
+        let alert = UIAlertController(title: "Уверены что хотите удалить трекер?",
+                                      message: nil,
+                                      preferredStyle: .actionSheet)
+        alert.addAction(UIAlertAction(title: "Удалить", style: .destructive) { _ in
+            try? self.trackerStore.deleteTracker(tracker)
+            self.categories = self.categoryStore.fetchCategories()
+            self.updateVisibleCategories()
+        })
+        alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
+        present(alert, animated: true)
+    }
+    
+    func trackersCollectionViewCellDidRequestEdit(_ cell: TrackersCollectionViewCell) {
+        guard let indexPath = collectionView.indexPath(for: cell) else { return }
+        let tracker = visibleCategories[indexPath.section].trackers[indexPath.item]
+        
+        // Если регулярное расписание не указано — это нерегулярное событие
+        guard let schedule = tracker.schedule else {
+            let alert = UIAlertController(title: NSLocalizedString("edit_not_allowed_title", comment: "Редактирование невозможно"),
+                                          message: NSLocalizedString("edit_not_allowed_message", comment: "Нерегулярное событие нельзя редактировать"),
+                                          preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            present(alert, animated: true)
+            return
+        }
+        
+        // Вычисляем количество выполнений
+        let completedCount = completedTrackers.filter { $0.id == tracker.id }.count
+        
+        // Создаём VC
+        let createHabitVC = CreateHabitViewController(
+            categoryStore: categoryStore,
+            existingTracker: tracker,
+            completedDaysCount: completedCount
+        )
+        
+        createHabitVC.listVCDelegate = self
+        let navVC = UINavigationController(rootViewController: createHabitVC)
+        present(navVC, animated: true)
+    }
 }
 
 extension TrackersViewController: CreateHabitViewControllerDelegate {
     func didCreateTracker(_ tracker: Tracker, in category: TrackerCategory) {
-        try? trackerStore.addNewTracker(tracker)
+        try? trackerStore.add(tracker, to: category)
+        
         
         if let index = categories.firstIndex(where: { $0.title == category.title }) {
             let old = categories[index]
@@ -306,8 +375,10 @@ extension TrackersViewController: CreateHabitViewControllerDelegate {
 }
 
 extension TrackersViewController: IrregularEventViewControllerDelegate {
+    
     func didCreatedIrregularevent(_ tracker: Tracker, in category: TrackerCategory) {
-        try? trackerStore.addNewTracker(tracker)
+        try? trackerStore.add(tracker, to: category)
+        
         
         if let index = categories.firstIndex(where: { $0.title == category.title }) {
             let old = categories[index]
@@ -315,7 +386,6 @@ extension TrackersViewController: IrregularEventViewControllerDelegate {
         } else {
             categories.append(TrackerCategory(title: category.title, trackers: [tracker]))
         }
-        
         collectionView.reloadData()
         updatePlaceholderVisibility()
     }
@@ -333,4 +403,5 @@ extension TrackersViewController: UISearchResultsUpdating {
         updateVisibleCategories(with: searchController.searchBar.text ?? "")
     }
 }
+
 
