@@ -35,7 +35,6 @@ final class ScheduleViewController: UIViewController {
     }
     private func setupUI() {
         //MARK: setting readyButton
-//        readyButton.setTitle("Готово", for: .normal)
         readyButton.setTitle(NSLocalizedString("done", comment: ""), for: .normal)
         readyButton.backgroundColor = .blackCastom
         readyButton.setTitleColor(.white, for: .normal)

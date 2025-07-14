@@ -22,4 +22,9 @@ final class Colors {
             trait.userInterfaceStyle == .dark ? .black : .white
         }
     }
+    var tabelViewColor: UIColor {
+        UIColor { trait in
+            trait.userInterfaceStyle == .dark ? .black : .white
+        }
+    }
 }
