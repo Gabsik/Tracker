@@ -21,8 +21,6 @@ final class StatisticsViewController: UIViewController {
         super.viewDidLoad()
         setup()
         fetchData()
-        
-        
     }
     
     private func setup() {
@@ -57,7 +55,6 @@ final class StatisticsViewController: UIViewController {
         placeholderImageView.snp.makeConstraints {
             $0.centerX.equalToSuperview()
             $0.centerY.equalToSuperview()
-            //            $0.width.height.equalTo(80)
         }
         
         placeholderLabel.snp.makeConstraints {
@@ -71,7 +68,7 @@ final class StatisticsViewController: UIViewController {
         tableView.reloadData()
         
         let shouldShowPlaceholder = stats.allSatisfy { $0.number == 0 }
-
+        
         tableView.isHidden = shouldShowPlaceholder
         placeholderImageView.isHidden = !shouldShowPlaceholder
         placeholderLabel.isHidden = !shouldShowPlaceholder

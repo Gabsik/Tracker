@@ -1,6 +1,7 @@
 
 import UIKit
 import SnapKit
+import AppMetricaCore
 
 final class TrackersViewController: UIViewController {
     private var categories: [TrackerCategory] = []
@@ -67,6 +68,27 @@ final class TrackersViewController: UIViewController {
         updateCompletedTrackerIDs()
 
     }
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        logEvent(event: "open", screen: "Main")
+    }
+
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        logEvent(event: "close", screen: "Main")
+    }
+    private func logEvent(event: String, screen: String, item: String? = nil) {
+        var parameters: [String: Any] = [
+            "event": event,
+            "screen": screen
+        ]
+        if let item = item {
+            parameters["item"] = item
+        }
+        AppMetrica.reportEvent(name: "ui_event", parameters: parameters)
+        print("AppMetrica LOG: \(parameters)")
+    }
+
     
     private func setup() {
         view.backgroundColor = colors.viewBackgroundColor
@@ -135,12 +157,16 @@ final class TrackersViewController: UIViewController {
     }
     
     @objc private func addFilterButtontapped() {
+        logEvent(event: "click", screen: "Main", item: "filter")
+
         let vc = FilterViewController(selectedFilter: currentFilter)
         vc.delegate = self
         present(UINavigationController(rootViewController: vc), animated: true)
     }
     
     @objc private func addButtonTapped() {
+        logEvent(event: "click", screen: "Main", item: "add_track")
+
         let trackerTypeSelectionVC = TrackerTypeSelectionViewController(categoryStore: categoryStore)
         trackerTypeSelectionVC.listVCDelegate = self
         trackerTypeSelectionVC.delegate = self
@@ -391,6 +417,8 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
 
 extension TrackersViewController: TrackersCollectionViewCellDelegate {
     func trackersCollectionViewCellDidTapCheckMark(_ cell: TrackersCollectionViewCell) {
+        logEvent(event: "click", screen: "Main", item: "track")
+
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
         let tracker = visibleCategories[indexPath.section].trackers[indexPath.item]
         if currentDate > Date() { return }
@@ -414,13 +442,14 @@ extension TrackersViewController: TrackersCollectionViewCellDelegate {
         })
         alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
         present(alert, animated: true)
+        
+        logEvent(event: "click", screen: "Main", item: "delete")
     }
     
     func trackersCollectionViewCellDidRequestEdit(_ cell: TrackersCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
         let tracker = visibleCategories[indexPath.section].trackers[indexPath.item]
         
-        // Если регулярное расписание не указано — это нерегулярное событие
         guard let schedule = tracker.schedule else {
             let alert = UIAlertController(title: NSLocalizedString("edit_not_allowed_title", comment: "Редактирование невозможно"),
                                           message: NSLocalizedString("edit_not_allowed_message", comment: "Нерегулярное событие нельзя редактировать"),
@@ -441,6 +470,8 @@ extension TrackersViewController: TrackersCollectionViewCellDelegate {
         createHabitVC.listVCDelegate = self
         let navVC = UINavigationController(rootViewController: createHabitVC)
         present(navVC, animated: true)
+        logEvent(event: "click", screen: "Main", item: "edit")
+
     }
 }
 
