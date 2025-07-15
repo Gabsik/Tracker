@@ -15,7 +15,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         trackersVC.tabBarItem = UITabBarItem(title: "Трекеры", image: UIImage(named: "trackersIcon"), tag: 0)
         
         let statisticsVC = StatisticsViewController()
-        statisticsVC.tabBarItem = UITabBarItem(title: "Статистика", image: UIImage(named: "statisticsIcon"), tag: 1)
+        statisticsVC.tabBarItem = UITabBarItem(title: NSLocalizedString("static_title", comment: "Заголовок экрана"), image: UIImage(named: "statisticsIcon"), tag: 1)
         let trackersNavigationVC = UINavigationController(rootViewController: trackersVC)
         let statisticsNavigationVC = UINavigationController(rootViewController: statisticsVC )
         

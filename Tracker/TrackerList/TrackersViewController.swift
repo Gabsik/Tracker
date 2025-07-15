@@ -39,15 +39,17 @@ final class TrackersViewController: UIViewController {
         return TrackerCategoryStore(context: context)
     }()
     private var currentFilter: TrackerFilter = .default
-
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        additionalSafeAreaInsets.top = 1
         setup()
         setupTopNavigationBar()
         addView()
         collectionView.delegate = self
         collectionView.dataSource = self
+        collectionView.contentInset = UIEdgeInsets(top: 1, left: 0, bottom: 0, right: 0)
         collectionView.showsVerticalScrollIndicator = false
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.register(TrackersCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
@@ -61,12 +63,16 @@ final class TrackersViewController: UIViewController {
             currentDate = today
         }
         updateVisibleCategories()
+        completedTrackers = recordStore.fetchRecords()
+        updateCompletedTrackerIDs()
+
     }
     
     private func setup() {
         view.backgroundColor = colors.viewBackgroundColor
     }
     private func setupTopNavigationBar() {
+        // MARK:  Left button
         let image = UIImage(named: "plusButton")
         let addButton = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(addButtonTapped))
         addButton.tintColor = colors.navigationBarButtonColor
@@ -76,6 +82,17 @@ final class TrackersViewController: UIViewController {
         title = NSLocalizedString("trackers_title", comment: "Заголовок экрана")
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .always
+        
+        // MARK:  Appearance
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = colors.viewBackgroundColor
+        appearance.titleTextAttributes = [.foregroundColor: UIColor.label]
+        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.label]
+        
+        navigationController?.navigationBar.standardAppearance = appearance
+        navigationController?.navigationBar.scrollEdgeAppearance = appearance
+        navigationController?.navigationBar.compactAppearance = appearance
         
         //MARK: setting searchController
         let searchController = UISearchController(searchResultsController: nil)
@@ -111,7 +128,7 @@ final class TrackersViewController: UIViewController {
         placeholderLabel.isHidden = true
         
         //MARK: setting filterButton
-        filterButton.setTitle("Фильтры", for: .normal)
+        filterButton.setTitle(NSLocalizedString("filter_button_title", comment: ""), for: .normal)
         filterButton.backgroundColor = .blueCastom
         filterButton.layer.cornerRadius = 16
         filterButton.addTarget(self, action: #selector(addFilterButtontapped), for: .touchUpInside)
@@ -119,8 +136,8 @@ final class TrackersViewController: UIViewController {
     
     @objc private func addFilterButtontapped() {
         let vc = FilterViewController(selectedFilter: currentFilter)
-            vc.delegate = self
-            present(UINavigationController(rootViewController: vc), animated: true)
+        vc.delegate = self
+        present(UINavigationController(rootViewController: vc), animated: true)
     }
     
     @objc private func addButtonTapped() {
@@ -147,9 +164,14 @@ final class TrackersViewController: UIViewController {
     }
     
     private func сonstraints() {
+//        collectionView.snp.makeConstraints { make in
+//            make.trailing.leading.equalToSuperview().inset(16)
+//            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).inset(24)
+//            make.bottom.equalToSuperview()
+//        }
         collectionView.snp.makeConstraints { make in
-            make.trailing.leading.equalToSuperview().inset(16)
-            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).inset(24)
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top) // БЕЗ inset(24)
+            make.leading.trailing.equalToSuperview().inset(16)
             make.bottom.equalToSuperview()
         }
         placeholderImageView.snp.makeConstraints { make in
@@ -169,7 +191,7 @@ final class TrackersViewController: UIViewController {
     private func updateCompletedTrackerIDs() {
         completedTrackerIDs = Set(completedTrackers
                                     .filter { Calendar.current.isDate($0.date, inSameDayAs: currentDate) }
-                                    .map { $0.id })
+                                    .map { $0.trackerID })
     }
     private func isTrackerVisible(_ tracker: Tracker) -> Bool {
         if let schedule = tracker.schedule {
@@ -185,7 +207,7 @@ final class TrackersViewController: UIViewController {
             return false
         }
         if let completion = completedTrackers
-            .first(where: { $0.id == tracker.id }) {
+            .first(where: { $0.trackerID == tracker.id }) {
             let completedDay = Calendar.current.startOfDay(for: completion.date)
             
             if currentDay > completedDay {
@@ -228,13 +250,21 @@ final class TrackersViewController: UIViewController {
             completedTrackers.removeAll { $0.id == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: currentDate) }
             completedTrackerIDs.remove(tracker.id)
         } else {
-            completedTrackers.append(TrackerRecord(id: tracker.id, date: currentDate))
-            completedTrackerIDs.insert(tracker.id)
-        }
+//            completedTrackers.append(TrackerRecord(id: tracker.id, date: currentDate))
+//            completedTrackerIDs.insert(tracker.id)
+            let newRecord = TrackerRecord(id: UUID(), trackerID: tracker.id, date: currentDate)
+            do {
+                try recordStore.addRecord(newRecord) // ✅ сохранение в Core Data
+                completedTrackers.append(newRecord)
+                completedTrackerIDs.insert(tracker.id)
+            } catch {
+                print("Ошибка при сохранении записи трекера: \(error)")
+            }
+    }
     }
     
     private func getDaysCount(for tracker: Tracker) -> Int {
-        completedTrackers.filter { $0.id == tracker.id }.count
+        completedTrackers.filter { $0.trackerID == tracker.id }.count
     }
     
     private func updatePlaceholderVisibility() {
@@ -242,29 +272,10 @@ final class TrackersViewController: UIViewController {
         placeholderImageView.isHidden = !isEmpty
         placeholderLabel.isHidden = !isEmpty
     }
-//    private func updateVisibleCategories(with searchText: String = "") {
-//        if searchText.isEmpty {
-//            visibleCategories = categories.map { category in
-//                let visibleTrackers = category.trackers
-//                    .filter { isTrackerVisible($0) }
-//                    .sorted { $0.title < $1.title }
-//                return TrackerCategory(title: category.title, trackers: visibleTrackers)
-//            }.filter { !$0.trackers.isEmpty }
-//        } else {
-//            visibleCategories = categories.compactMap { category in
-//                let matchingTrackers = category.trackers
-//                    .filter { isTrackerVisible($0) && $0.title.lowercased().contains(searchText.lowercased()) }
-//                    .sorted { $0.title < $1.title }
-//                return matchingTrackers.isEmpty ? nil : TrackerCategory(title: category.title, trackers: matchingTrackers)
-//            }
-//        }
-//
-//        collectionView.reloadData()
-//        updatePlaceholderVisibility()
-//    }
+    
     private func updateVisibleCategories(with searchText: String = "") {
         let filtered: [TrackerCategory]
-
+        
         if searchText.isEmpty {
             filtered = categories.map { category in
                 let trackers = category.trackers.filter { tracker in
@@ -302,13 +313,13 @@ final class TrackersViewController: UIViewController {
                 return trackers.isEmpty ? nil : TrackerCategory(title: category.title, trackers: trackers.sorted { $0.title < $1.title })
             }
         }
-
+        
         visibleCategories = filtered
         collectionView.reloadData()
         updatePlaceholderVisibility()
         filterButton.isHidden = categories.allSatisfy { $0.trackers.filter { isTrackerVisible($0) }.isEmpty }
     }
-
+    
     
     func updateDatePickerTextColor(_ view: UIView) {
         for subview in view.subviews {
@@ -323,6 +334,14 @@ final class TrackersViewController: UIViewController {
             updateDatePickerTextColor(subview)
         }
     }
+    private let recordStore: TrackerRecordStore = {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            fatalError("Unable to get AppDelegate")
+        }
+        let context = appDelegate.persistentContainer.viewContext
+        return TrackerRecordStore(context: context)
+    }()
+
 }
 
 extension TrackersViewController: UICollectionViewDataSource {
@@ -479,7 +498,7 @@ extension TrackersViewController: FilterViewControllerDelegate {
             currentDate = Date()
             datePicker.setDate(currentDate, animated: true)
         }
-
+        
         currentFilter = filter
         updateCompletedTrackerIDs()
         updateVisibleCategories(with: navigationItem.searchController?.searchBar.text ?? "")

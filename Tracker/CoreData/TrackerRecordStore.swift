@@ -36,6 +36,7 @@ final class TrackerRecordStore: NSObject {
         let entity = TrackerRecordCoreData(context: context)
         entity.id = record.id
         entity.date = record.date
+        entity.trackerID = record.trackerID 
         try context.save()
     }
 }

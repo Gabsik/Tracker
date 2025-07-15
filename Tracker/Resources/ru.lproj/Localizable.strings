@@ -1,12 +1,15 @@
 
 /* Главный заголовок на экране трекеров */
 "trackers_title" = "Трекеры";
+"static_title" = "Статистика";
 
 /* Плейсхолдер, когда трекеров нет */
 "placeholder_text" = "Что будем отслеживать?";
 
 /* Плейсхолдер в поиске */
 "search_placeholder" = "Поиск";
+
+"filter_button_title" = "Фильтры";
 
 //CategoriesViewController
 "categoryTitle" = "Категория";
@@ -59,5 +62,7 @@
 "saturday" = "Суббота";
 "sunday" = "Воскресенье";
 
-
 "edit_habit_title" = "Редактирование привычки";
+
+"no_data_placeholder" = "Анализировать пока нечего";
+
