@@ -66,13 +66,13 @@ final class TrackersViewController: UIViewController {
         updateVisibleCategories()
         completedTrackers = recordStore.fetchRecords()
         updateCompletedTrackerIDs()
-
+        
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         logEvent(event: "open", screen: "Main")
     }
-
+    
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         logEvent(event: "close", screen: "Main")
@@ -88,7 +88,7 @@ final class TrackersViewController: UIViewController {
         AppMetrica.reportEvent(name: "ui_event", parameters: parameters)
         print("AppMetrica LOG: \(parameters)")
     }
-
+    
     
     private func setup() {
         view.backgroundColor = colors.viewBackgroundColor
@@ -158,7 +158,7 @@ final class TrackersViewController: UIViewController {
     
     @objc private func addFilterButtontapped() {
         logEvent(event: "click", screen: "Main", item: "filter")
-
+        
         let vc = FilterViewController(selectedFilter: currentFilter)
         vc.delegate = self
         present(UINavigationController(rootViewController: vc), animated: true)
@@ -166,7 +166,7 @@ final class TrackersViewController: UIViewController {
     
     @objc private func addButtonTapped() {
         logEvent(event: "click", screen: "Main", item: "add_track")
-
+        
         let trackerTypeSelectionVC = TrackerTypeSelectionViewController(categoryStore: categoryStore)
         trackerTypeSelectionVC.listVCDelegate = self
         trackerTypeSelectionVC.delegate = self
@@ -190,13 +190,8 @@ final class TrackersViewController: UIViewController {
     }
     
     private func сonstraints() {
-//        collectionView.snp.makeConstraints { make in
-//            make.trailing.leading.equalToSuperview().inset(16)
-//            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).inset(24)
-//            make.bottom.equalToSuperview()
-//        }
         collectionView.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide.snp.top) // БЕЗ inset(24)
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
             make.leading.trailing.equalToSuperview().inset(16)
             make.bottom.equalToSuperview()
         }
@@ -271,22 +266,48 @@ final class TrackersViewController: UIViewController {
         collectionView.reloadData()
     }
     
+//    private func toggleCompletion(for tracker: Tracker) {
+//        if completedTrackerIDs.contains(tracker.id) {
+//            completedTrackers.removeAll { $0.id == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: currentDate) }
+//            completedTrackerIDs.remove(tracker.id)
+//        } else {
+//            let newRecord = TrackerRecord(id: UUID(), trackerID: tracker.id, date: currentDate)
+//            do {
+//                try recordStore.addRecord(newRecord)
+//                completedTrackers.append(newRecord)
+//                completedTrackerIDs.insert(tracker.id)
+//            } catch {
+//                print("Ошибка при сохранении записи трекера: \(error)")
+//            }
+//        }
+//        NotificationCenter.default.post(name: .trackerDataDidChange, object: nil)
+//    }
+    
     private func toggleCompletion(for tracker: Tracker) {
         if completedTrackerIDs.contains(tracker.id) {
-            completedTrackers.removeAll { $0.id == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: currentDate) }
-            completedTrackerIDs.remove(tracker.id)
+            if let recordToDelete = completedTrackers.first(where: {
+                $0.trackerID == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: currentDate)
+            }) {
+                do {
+                    try recordStore.deleteRecord(recordToDelete)
+                    completedTrackers.removeAll { $0.id == recordToDelete.id }
+                    completedTrackerIDs.remove(tracker.id)
+                } catch {
+                    print("Ошибка при удалении записи трекера: \(error)")
+                }
+            }
         } else {
-//            completedTrackers.append(TrackerRecord(id: tracker.id, date: currentDate))
-//            completedTrackerIDs.insert(tracker.id)
             let newRecord = TrackerRecord(id: UUID(), trackerID: tracker.id, date: currentDate)
             do {
-                try recordStore.addRecord(newRecord) // ✅ сохранение в Core Data
+                try recordStore.addRecord(newRecord)
                 completedTrackers.append(newRecord)
                 completedTrackerIDs.insert(tracker.id)
             } catch {
                 print("Ошибка при сохранении записи трекера: \(error)")
             }
-    }
+        }
+
+        NotificationCenter.default.post(name: .trackerDataDidChange, object: nil)
     }
     
     private func getDaysCount(for tracker: Tracker) -> Int {
@@ -367,7 +388,7 @@ final class TrackersViewController: UIViewController {
         let context = appDelegate.persistentContainer.viewContext
         return TrackerRecordStore(context: context)
     }()
-
+    
 }
 
 extension TrackersViewController: UICollectionViewDataSource {
@@ -418,7 +439,7 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
 extension TrackersViewController: TrackersCollectionViewCellDelegate {
     func trackersCollectionViewCellDidTapCheckMark(_ cell: TrackersCollectionViewCell) {
         logEvent(event: "click", screen: "Main", item: "track")
-
+        
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
         let tracker = visibleCategories[indexPath.section].trackers[indexPath.item]
         if currentDate > Date() { return }
@@ -439,6 +460,7 @@ extension TrackersViewController: TrackersCollectionViewCellDelegate {
             try? self.trackerStore.deleteTracker(tracker)
             self.categories = self.categoryStore.fetchCategories()
             self.updateVisibleCategories()
+            NotificationCenter.default.post(name: .trackerDataDidChange, object: nil)
         })
         alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
         present(alert, animated: true)
@@ -458,20 +480,16 @@ extension TrackersViewController: TrackersCollectionViewCellDelegate {
             present(alert, animated: true)
             return
         }
-        
         let completedCount = completedTrackers.filter { $0.id == tracker.id }.count
-        
         let createHabitVC = CreateHabitViewController(
             categoryStore: categoryStore,
             existingTracker: tracker,
             completedDaysCount: completedCount
         )
-        
         createHabitVC.listVCDelegate = self
         let navVC = UINavigationController(rootViewController: createHabitVC)
         present(navVC, animated: true)
         logEvent(event: "click", screen: "Main", item: "edit")
-
     }
 }
 
@@ -490,11 +508,11 @@ extension TrackersViewController: CreateHabitViewControllerDelegate {
         
         collectionView.reloadData()
         updatePlaceholderVisibility()
+        NotificationCenter.default.post(name: .trackerDataDidChange, object: nil)
     }
 }
 
 extension TrackersViewController: IrregularEventViewControllerDelegate {
-    
     func didCreatedIrregularevent(_ tracker: Tracker, in category: TrackerCategory) {
         try? trackerStore.add(tracker, to: category)
         
@@ -507,6 +525,7 @@ extension TrackersViewController: IrregularEventViewControllerDelegate {
         }
         collectionView.reloadData()
         updatePlaceholderVisibility()
+        NotificationCenter.default.post(name: .trackerDataDidChange, object: nil)
     }
 }
 

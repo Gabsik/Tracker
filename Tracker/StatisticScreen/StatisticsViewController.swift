@@ -1,7 +1,10 @@
 
-
 import UIKit
 import SnapKit
+
+extension Notification.Name {
+    static let trackerDataDidChange = Notification.Name("trackerDataDidChange")
+}
 
 final class StatisticsViewController: UIViewController {
     private let tableView = UITableView()
@@ -9,8 +12,11 @@ final class StatisticsViewController: UIViewController {
     private let placeholderImageView = UIImageView()
     private let placeholderLabel = UILabel()
     
-    private let statsService: StatsService = {
-        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    private lazy var statsService: StatsService = {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            fatalError("Unable to cast UIApplication delegate to AppDelegate")
+        }
+        let context = appDelegate.persistentContainer.viewContext
         return StatsService(
             trackerStore: TrackerStore(context: context),
             recordStore: TrackerRecordStore(context: context)
@@ -21,6 +27,13 @@ final class StatisticsViewController: UIViewController {
         super.viewDidLoad()
         setup()
         fetchData()
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleTrackerDataDidChange),
+            name: .trackerDataDidChange,
+            object: nil
+        )
     }
     
     private func setup() {
@@ -73,6 +86,12 @@ final class StatisticsViewController: UIViewController {
         placeholderImageView.isHidden = !shouldShowPlaceholder
         placeholderLabel.isHidden = !shouldShowPlaceholder
     }
+    @objc private func handleTrackerDataDidChange() {
+        fetchData()
+    }
+    deinit {
+            NotificationCenter.default.removeObserver(self, name: .trackerDataDidChange, object: nil)
+        }
 }
 
 extension StatisticsViewController: UITableViewDataSource {

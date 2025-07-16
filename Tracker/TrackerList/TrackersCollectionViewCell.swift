@@ -113,7 +113,7 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
     override var canBecomeFirstResponder: Bool {
         true
     }
-
+    
     
     func configure(with tracker: Tracker, daysCount: Int, isCompletedToday: Bool, isFutureDate: Bool) {
         self.tracker = tracker
@@ -138,7 +138,7 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
             overlayImageView.image = UIImage(named: "Done")
             overlayImageView.isHidden = false
             overlayImageView.tintColor = colors.doneIconColor
-
+            
             
         } else {
             let checkmarkImage = UIImage(named: "checkMarkButton")?.withRenderingMode(.alwaysTemplate)
@@ -188,18 +188,17 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
 
 extension TrackersCollectionViewCell: UIContextMenuInteractionDelegate {
     func contextMenuInteraction(_ interaction: UIContextMenuInteraction,
-                                 configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
-        guard let tracker = tracker else { return nil }
-
+                                configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
         return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
             let edit = UIAction(title: "Редактировать") { [weak self] _ in
-                self?.delegate?.trackersCollectionViewCellDidRequestEdit(self!)
+                guard let self = self else { return }
+                self.delegate?.trackersCollectionViewCellDidRequestEdit(self)
             }
-
+            
             let delete = UIAction(title: "Удалить", attributes: .destructive) { [weak self] _ in
-                self?.delegate?.trackersCollectionViewCellDidRequestDelete(self!)
+                guard let self = self else { return }
+                self.delegate?.trackersCollectionViewCellDidRequestDelete(self)
             }
-
             return UIMenu(title: "", children: [edit, delete])
         }
     }

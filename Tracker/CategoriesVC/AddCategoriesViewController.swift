@@ -48,7 +48,6 @@ final class AddCategoriesViewController: UIViewController {
         textField.leftViewMode = .always
         
         //MARK: readyButton
-//        readyButton.setTitle("Готово", for: .normal)
         readyButton.setTitle(NSLocalizedString("doneButtonTitle", comment: "Кнопка Готово"), for: .normal)
         readyButton.layer.cornerRadius = 16
         readyButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
