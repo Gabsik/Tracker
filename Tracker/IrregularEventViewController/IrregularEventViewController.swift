@@ -43,11 +43,12 @@ final class IrregularEventViewController: UIViewController {
     }
     private func setup() {
         view.backgroundColor = .white
-        title = "Новое нерегулярное событие"
+        title = NSLocalizedString("new_irregular_event", comment: "")
     }
     private func settingUI() {
         //MARK: setting irregularEventTextField
-        irregularEventTextField.placeholder = "Ведите название трекера"
+//        irregularEventTextField.placeholder = "Ведите название трекера"
+        irregularEventTextField.placeholder = NSLocalizedString("enter_tracker_name", comment: "")
         irregularEventTextField.layer.cornerRadius = 16
         irregularEventTextField.backgroundColor = .background
         irregularEventTextField.borderStyle = .none
@@ -56,7 +57,8 @@ final class IrregularEventViewController: UIViewController {
         irregularEventTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
         
         //MARK: setting category
-        categoryLabel.text = "Категория"
+//        categoryLabel.text = "Категория"
+        categoryLabel.text = NSLocalizedString("category", comment: "")
         categoryLabel.textColor = .blackCastom
         categoryArrow.image = UIImage(named: "chevron")
         let tapGesturecategoryTapped = UITapGestureRecognizer(target: self, action: #selector(categoryTapped))
@@ -68,7 +70,8 @@ final class IrregularEventViewController: UIViewController {
         subtitlesCategoryLabel.font = UIFont.systemFont(ofSize: 17, weight: .regular)
         
         //MARK: setting buttonCancel
-        cancelbutton.setTitle("Отменить", for: .normal)
+//        cancelbutton.setTitle("Отменить", for: .normal)
+        cancelbutton.setTitle(NSLocalizedString("cancel", comment: ""), for: .normal)
         cancelbutton.setTitleColor(.redCastom, for: .normal)
         cancelbutton.backgroundColor = .white
         cancelbutton.layer.borderWidth = 1
@@ -77,7 +80,8 @@ final class IrregularEventViewController: UIViewController {
         cancelbutton.addTarget(self, action: #selector(cancelTapped), for: .touchUpInside)
         
         //MARK: setting createButton
-        createButton.setTitle("Создать", for: .normal)
+//        createButton.setTitle("Создать", for: .normal)
+        createButton.setTitle(NSLocalizedString("create", comment: ""), for: .normal)
         createButton.setTitleColor(.white, for: .normal)
         createButton.backgroundColor = .grayCastom
         createButton.layer.cornerRadius = 16
@@ -142,7 +146,8 @@ final class IrregularEventViewController: UIViewController {
         
         categoriesVC.onCategorySelected = { [weak self] category in
             self?.selectedCategory = category
-            self?.categoryLabel.text = "Категория"
+//            self?.categoryLabel.text = "Категория"
+            self?.categoryLabel.text = NSLocalizedString("category", comment: "")
             self?.subtitlesCategoryLabel.text = category.title
             self?.updateCreateButtonState()
         }
@@ -158,7 +163,7 @@ final class IrregularEventViewController: UIViewController {
             return
         }
         guard let category = selectedCategory else {
-            let alert = UIAlertController(title: "Ошибка", message: "Выберите категорию.", preferredStyle: .alert)
+            let alert = UIAlertController(title: NSLocalizedString("error", comment: ""), message: NSLocalizedString("select_category", comment: ""), preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "Ок", style: .default))
             present(alert, animated: true)
             return

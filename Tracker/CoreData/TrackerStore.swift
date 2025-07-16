@@ -35,34 +35,44 @@ final class TrackerStore: NSObject {
         return result
     }
     
-    func addNewTracker(_ tracker: Tracker) throws {
-        let entity = TrackerCoreData(context: context)
-        entity.id = tracker.id
-        entity.title = tracker.title
-        entity.emoji = tracker.emoji
-        entity.createdAt = tracker.createdAt
-        if let schedule = tracker.schedule {
-            entity.schedule = schedule.map { $0.rawValue } as NSArray
+    func add(_ tracker: Tracker, to category: TrackerCategory) throws {
+            let entity = TrackerCoreData(context: context)
+            entity.id = tracker.id
+            entity.title = tracker.title
+            entity.emoji = tracker.emoji
+            entity.createdAt = tracker.createdAt
+            if let schedule = tracker.schedule {
+                entity.schedule = schedule.map { $0.rawValue } as NSArray
+            }
+            entity.color = UIColorMarshalling.serialize(tracker.color)
+
+            let request: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+            request.predicate = NSPredicate(format: "title == %@", category.title)
+
+            let fetched = try context.fetch(request)
+            let categoryCoreData: TrackerCategoryCoreData
+
+            if let existing = fetched.first {
+                categoryCoreData = existing
+            } else {
+                categoryCoreData = TrackerCategoryCoreData(context: context)
+                categoryCoreData.title = category.title
+            }
+
+            entity.category = categoryCoreData
+
+            try context.save()
         }
-        entity.color = UIColorMarshalling.serialize(tracker.color)
 
-        let request: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
-        request.predicate = NSPredicate(format: "title == %@", "Мои трекеры")
-
-        let categories = try context.fetch(request)
-        let category: TrackerCategoryCoreData
-        if let existingCategory = categories.first {
-            category = existingCategory
-        } else {
-            category = TrackerCategoryCoreData(context: context)
-            category.title = "Мои трекеры"
+    
+    func deleteTracker(_ tracker: Tracker) throws {
+        let request = TrackerCoreData.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %@", tracker.id as CVarArg)
+        if let object = try context.fetch(request).first {
+            context.delete(object)
+            try context.save()
         }
-
-        entity.category = category
-
-        try context.save()
     }
-
 }
 
 extension TrackerStore: NSFetchedResultsControllerDelegate {

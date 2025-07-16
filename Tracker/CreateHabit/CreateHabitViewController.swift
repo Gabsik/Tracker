@@ -5,6 +5,7 @@ import SnapKit
 
 protocol CreateHabitViewControllerDelegate: AnyObject {
     func didCreateTracker(_ tracker: Tracker, in category: TrackerCategory)
+    //    func didUpdateTracker(_ tracker: Tracker, in category: TrackerCategory)
 }
 
 final class CreateHabitViewController: UIViewController {
@@ -39,10 +40,14 @@ final class CreateHabitViewController: UIViewController {
     private var selectedCategory: TrackerCategory?
     private let subtitlesCategoryLabel = UILabel()
     
+    private var existingTracker: Tracker?
+    private var completedDaysCount: Int = 0
+    private let completedDaysLabel = UILabel()
     
-    
-    init(categoryStore: TrackerCategoryStore) {
+    init(categoryStore: TrackerCategoryStore, existingTracker: Tracker? = nil, completedDaysCount: Int = 0) {
         self.categoryStore = categoryStore
+        self.existingTracker = existingTracker
+        self.completedDaysCount = completedDaysCount
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -72,15 +77,41 @@ final class CreateHabitViewController: UIViewController {
                                  withReuseIdentifier: "header")
         collectionEmoji.isScrollEnabled = false
         collectionColor.isScrollEnabled = false
+        
+        
+        if let tracker = existingTracker {
+            title = NSLocalizedString("edit_habit_title", comment: "")
+            habitNameTextField.text = tracker.title
+            selectedEmoji = tracker.emoji
+            selectedColor = tracker.color
+            schedule = tracker.schedule ?? []
+            subtitlesScheduleLabel.text = schedule.map { $0.shortForm() }.joined(separator: ", ")
+            selectedCategory = categoryStore.fetchCategories().first { $0.trackers.contains(where: { $0.id == tracker.id }) }
+            subtitlesCategoryLabel.text = selectedCategory?.title
+            createButton.setTitle(NSLocalizedString("Сохранить", comment: ""), for: .normal)
+            setupCompletedDaysLabel()
+        }
     }
+    
+    private func setupCompletedDaysLabel() {
+        completedDaysLabel.font = UIFont.systemFont(ofSize: 24, weight: .bold)
+        completedDaysLabel.textColor = .black
+        completedDaysLabel.textAlignment = .center
+        completedDaysLabel.text = String.localizedStringWithFormat(
+            NSLocalizedString("numberOfDays", comment: "дней"),
+            completedDaysCount
+        )
+        
+    }
+    
     
     private func setup() {
         view.backgroundColor = .white
-        title = "Новая привычка"
+        title = NSLocalizedString("new_habit", comment: "")
     }
     private func settingUI() {
         //MARK: setting habitNameTextField
-        habitNameTextField.placeholder = "Ведите название трекера"
+        habitNameTextField.placeholder = NSLocalizedString("enter_tracker_name", comment: "")
         habitNameTextField.layer.cornerRadius = 16
         habitNameTextField.backgroundColor = .background
         habitNameTextField.borderStyle = .none
@@ -97,7 +128,7 @@ final class CreateHabitViewController: UIViewController {
         containerView.clipsToBounds = true
         
         //MARK: setting category
-        categoryLabel.text = "Категория"
+        categoryLabel.text = NSLocalizedString("category", comment: "")
         categoryLabel.textColor = .blackCastom
         categoryArrow.image = UIImage(named: "chevron")
         subtitlesCategoryLabel.textColor = .grayCastom
@@ -106,7 +137,8 @@ final class CreateHabitViewController: UIViewController {
         categoryView.addGestureRecognizer(tapGesturecategoryTapped)
         
         //MARK: setting schedule
-        scheduleLabel.text = "Расписание"
+        //        scheduleLabel.text = "Расписание"
+        scheduleLabel.text = NSLocalizedString("schedule", comment: "")
         scheduleLabel.textColor = .blackCastom
         scheduleLabel.font = UIFont.systemFont(ofSize: 17, weight: .regular)
         scheduleArrow.image = UIImage(named: "chevron")
@@ -122,7 +154,7 @@ final class CreateHabitViewController: UIViewController {
         stackView.distribution = .fillEqually
         
         //MARK: setting buttonCancel
-        cancelbutton.setTitle("Отменить", for: .normal)
+        cancelbutton.setTitle(NSLocalizedString("cancel", comment: ""), for: .normal)
         cancelbutton.setTitleColor(.redCastom, for: .normal)
         cancelbutton.backgroundColor = .white
         cancelbutton.layer.borderWidth = 1
@@ -131,7 +163,7 @@ final class CreateHabitViewController: UIViewController {
         cancelbutton.addTarget(self, action: #selector(cancelTapped), for: .touchUpInside)
         
         //MARK: setting createButton
-        createButton.setTitle("Создать", for: .normal)
+        createButton.setTitle(NSLocalizedString("create", comment: ""), for: .normal)
         createButton.setTitleColor(.white, for: .normal)
         createButton.backgroundColor = .grayCastom
         createButton.layer.cornerRadius = 16
@@ -160,6 +192,9 @@ final class CreateHabitViewController: UIViewController {
         stackView.addArrangedSubview(createButton)
         categoryView.addSubview(subtitlesCategoryLabel)
         
+        contentView.addSubview(completedDaysLabel)
+        
+        
     }
     private func addConstraints() {
         scrollView.snp.makeConstraints { make in
@@ -172,10 +207,23 @@ final class CreateHabitViewController: UIViewController {
             make.width.equalTo(scrollView)
         }
         
-        habitNameTextField.snp.makeConstraints { make in
-            make.top.equalTo(contentView.snp.top).offset(20)
-            make.leading.trailing.equalToSuperview().inset(16)
-            make.height.equalTo(75)
+        if existingTracker != nil {
+            completedDaysLabel.snp.makeConstraints { make in
+                make.top.equalTo(contentView.snp.top).offset(8)
+                make.centerX.equalToSuperview()
+            }
+            
+            habitNameTextField.snp.makeConstraints { make in
+                make.top.equalTo(completedDaysLabel.snp.bottom).offset(16)
+                make.leading.trailing.equalToSuperview().inset(16)
+                make.height.equalTo(75)
+            }
+        } else {
+            habitNameTextField.snp.makeConstraints { make in
+                make.top.equalTo(contentView.snp.top).offset(20)
+                make.leading.trailing.equalToSuperview().inset(16)
+                make.height.equalTo(75)
+            }
         }
         
         containerView.snp.makeConstraints { make in
@@ -278,8 +326,8 @@ final class CreateHabitViewController: UIViewController {
         }
         guard !schedule.isEmpty else {
             let alert = UIAlertController(
-                title: "Ошибка",
-                message: "Пожалуйста, выберите хотя бы один день для расписания.",
+                title: NSLocalizedString("error", comment: ""),
+                message: NSLocalizedString("schedule_error", comment: ""),
                 preferredStyle: .alert
             )
             alert.addAction(UIAlertAction(title: "Ок", style: .default, handler: nil))
@@ -401,9 +449,9 @@ extension CreateHabitViewController: UICollectionViewDelegateFlowLayout {
                                                                      withReuseIdentifier: "header",
                                                                      for: indexPath) as! HeaderReusableView
         if collectionView == collectionEmoji {
-            header.titleLabel.text = "Emoji"
+            header.titleLabel.text = NSLocalizedString("emoji", comment: "")
         } else if collectionView == collectionColor {
-            header.titleLabel.text = "Цвета"
+            header.titleLabel.text = NSLocalizedString("colors", comment: "")
         }
         return header
     }

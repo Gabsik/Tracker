@@ -1,0 +1,68 @@
+
+
+/* Main title on the trackers screen */
+"trackers_title" = "Trackers";
+"static_title" = "Statistics";
+
+/* Placeholder when there are no trackers */
+"placeholder_text" = "What would you like to track?";
+
+/* Search bar placeholder */
+"search_placeholder" = "Search";
+
+"filter_button_title" = "Filters";
+
+// CategoriesViewController
+"categoryTitle" = "Category";
+"addCategoryButtonTitle" = "Add Category";
+"categoryPlaceholder" = "You can group habits and events by meaning";
+
+// AddCategoriesViewController
+"newCategoryTitle" = "New Category";
+"enterCategoryPlaceholder" = "Enter category name";
+"doneButtonTitle" = "Done";
+
+// OnboardingPageController
+"onboardingPage1Title" = "Track only what you care about";
+"onboardingPage2Title" = "Even if it's not liters of water and yoga";
+"onboardingContinueButton" = "That’s technology!";
+
+/* TrackerTypeSelectionViewController */
+"create_tracker" = "Create Tracker";
+"habit" = "Habit";
+"irregular_event" = "Irregular Event";
+
+/* IrregularEventViewController */
+"new_irregular_event" = "New Irregular Event";
+"enter_tracker_name" = "Enter tracker name";
+"category" = "Category";
+"cancel" = "Cancel";
+"create" = "Create";
+"error" = "Error";
+"select_category" = "Please select a category.";
+
+/* CreateHabitViewController */
+"new_habit" = "New Habit";
+"schedule" = "Schedule";
+"schedule_error" = "Please select at least one day for the schedule.";
+"select_emoji" = "Please select an emoji.";
+"select_color" = "Please select a color.";
+"emoji" = "Emoji";
+"colors" = "Colors";
+
+/* ScheduleViewController */
+"schedule_title" = "Schedule";
+"done" = "Done";
+
+/* Weekdays */
+"monday" = "Monday";
+"tuesday" = "Tuesday";
+"wednesday" = "Wednesday";
+"thursday" = "Thursday";
+"friday" = "Friday";
+"saturday" = "Saturday";
+"sunday" = "Sunday";
+
+"edit_habit_title" = "Edit Habit";
+
+"no_data_placeholder" = "There is nothing to analyze yet";

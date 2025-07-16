@@ -3,6 +3,8 @@ import SnapKit
 
 protocol TrackersCollectionViewCellDelegate: AnyObject {
     func trackersCollectionViewCellDidTapCheckMark(_ cell: TrackersCollectionViewCell)
+    func trackersCollectionViewCellDidRequestDelete(_ cell: TrackersCollectionViewCell)
+    func trackersCollectionViewCellDidRequestEdit(_ cell: TrackersCollectionViewCell)
 }
 
 final class TrackersCollectionViewCell: UICollectionViewCell {
@@ -15,6 +17,7 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
     private let containerButtonView = UIView()
     private let containerEmojiesView = UIView()
     private let overlayImageView = UIImageView()
+    private let colors = Colors()
     
     private var isCompletedToday: Bool = false
     private var daysCount: Int = 0
@@ -44,17 +47,21 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
         containerButtonView.addSubview(numberDaysLabel)
         checkMarkButton.addSubview(overlayImageView)
         
-        containerButtonView.backgroundColor = .white
-        containerView.layer.cornerRadius = 16
-        numberDaysLabel.textColor = .black
+        
+        containerButtonView.backgroundColor = colors.viewBackgroundColor
+        containerView.layer.cornerRadius = 13
+        numberDaysLabel.textColor = .label
         numberDaysLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         numberDaysLabel.numberOfLines = 2
+        
         
         checkMarkButton.layer.cornerRadius = 17
         checkMarkButton.addTarget(self, action: #selector(checkMarkButtonTapped), for: .touchUpInside)
         
         overlayImageView.contentMode = .scaleAspectFit
         overlayImageView.isUserInteractionEnabled = false
+        let contextMenuInteraction = UIContextMenuInteraction(delegate: self)
+        containerView.addInteraction(contextMenuInteraction)
         
         containerView.snp.makeConstraints { make in
             make.top.equalToSuperview().inset(0)
@@ -103,11 +110,19 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override var canBecomeFirstResponder: Bool {
+        true
+    }
+    
+    
     func configure(with tracker: Tracker, daysCount: Int, isCompletedToday: Bool, isFutureDate: Bool) {
         self.tracker = tracker
         nameLabel.text = tracker.title
         titleEmojiesLabel.text = tracker.emoji
-        numberDaysLabel.text = "\(daysCount) дней"
+        numberDaysLabel.text = String.localizedStringWithFormat(
+            NSLocalizedString("numberOfDays", comment: "дней"),
+            daysCount
+        )
         containerView.backgroundColor = tracker.color
         
         let imageName = isCompletedToday ? "Property" : "checkMarkButton"
@@ -122,12 +137,13 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
             
             overlayImageView.image = UIImage(named: "Done")
             overlayImageView.isHidden = false
+            overlayImageView.tintColor = colors.doneIconColor
+            
             
         } else {
             let checkmarkImage = UIImage(named: "checkMarkButton")?.withRenderingMode(.alwaysTemplate)
             checkMarkButton.setImage(checkmarkImage, for: .normal)
             checkMarkButton.tintColor = tracker.color
-            //            checkMarkButton.backgroundColor = .clear
             overlayImageView.isHidden = true
         }
         checkMarkButton.layer.masksToBounds = true
@@ -142,7 +158,10 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
     func update(isCompletedToday: Bool, daysCount: Int) {
         self.isCompletedToday = isCompletedToday
         self.daysCount = daysCount
-        numberDaysLabel.text = "\(daysCount) дней"
+        numberDaysLabel.text = String.localizedStringWithFormat(
+            NSLocalizedString("numberOfDays", comment: "дней"),
+            daysCount
+        )
         
         if isCompletedToday {
             let baseImage = UIImage(named: "Property")?.withRenderingMode(.alwaysTemplate)
@@ -150,6 +169,7 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
             
             overlayImageView.image = UIImage(named: "Done")
             overlayImageView.isHidden = false
+            overlayImageView.tintColor = colors.doneIconColor
             
             checkMarkButton.backgroundColor = tracker?.color.withAlphaComponent(0.5)
             checkMarkButton.tintColor = tracker?.color
@@ -165,4 +185,23 @@ final class TrackersCollectionViewCell: UICollectionViewCell {
         checkMarkButton.layer.masksToBounds = true
     }
 }
+
+extension TrackersCollectionViewCell: UIContextMenuInteractionDelegate {
+    func contextMenuInteraction(_ interaction: UIContextMenuInteraction,
+                                configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
+            let edit = UIAction(title: "Редактировать") { [weak self] _ in
+                guard let self = self else { return }
+                self.delegate?.trackersCollectionViewCellDidRequestEdit(self)
+            }
+            
+            let delete = UIAction(title: "Удалить", attributes: .destructive) { [weak self] _ in
+                guard let self = self else { return }
+                self.delegate?.trackersCollectionViewCellDidRequestDelete(self)
+            }
+            return UIMenu(title: "", children: [edit, delete])
+        }
+    }
+}
+
 

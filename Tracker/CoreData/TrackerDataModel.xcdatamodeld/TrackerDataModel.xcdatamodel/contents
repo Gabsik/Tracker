@@ -18,11 +18,12 @@
     <entity name="TrackerRecordCoreData" representedClassName="TrackerRecordCoreData" syncable="YES" codeGenerationType="class">
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="trackerID" attributeType="UUID" usesScalarValueType="NO"/>
         <relationship name="tracker" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="TrackerCoreData" inverseName="records" inverseEntity="TrackerCoreData"/>
     </entity>
     <elements>
         <element name="TrackerCategoryCoreData" positionX="-18" positionY="63" width="128" height="74"/>
         <element name="TrackerCoreData" positionX="-45" positionY="0" width="128" height="149"/>
-        <element name="TrackerRecordCoreData" positionX="9" positionY="81" width="128" height="74"/>
+        <element name="TrackerRecordCoreData" positionX="9" positionY="81" width="128" height="89"/>
     </elements>
 </model>

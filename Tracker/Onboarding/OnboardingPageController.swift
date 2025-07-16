@@ -11,8 +11,14 @@ final class OnboardingPageController: UIPageViewController {
     weak var onboardingDelegate: OnboardingDelegate?
     
     private let pagesData: [OnboardingPage] = [
-        .init(imageName: "OnboardingFirst", title: "Отслеживайте только то, что хотите", buttonTitle: "Вот это технологии!"),
-        .init(imageName: "OnboardingSecond", title: "Даже если это не литры воды и йога", buttonTitle: "Вот это технологии!")
+        .init(imageName: "OnboardingFirst",
+              title: NSLocalizedString("onboardingPage1Title", comment: "Текст на первом экране онбординга"),
+              buttonTitle: NSLocalizedString("onboardingContinueButton", comment: "Кнопка на онбординге")
+             ),
+        .init(imageName: "OnboardingSecond",
+              title: NSLocalizedString("onboardingPage2Title", comment: "Текст на втором экране онбординга"),
+              buttonTitle: NSLocalizedString("onboardingContinueButton", comment: "Кнопка на онбординге")
+             )
     ]
     
     private lazy var pages: [UIViewController] = pagesData.map {
@@ -55,7 +61,7 @@ final class OnboardingPageController: UIPageViewController {
         pageControl.snp.makeConstraints {
             $0.top.equalToSuperview().offset(638)
             $0.centerX.equalToSuperview()
-
+            
         }
     }
 }

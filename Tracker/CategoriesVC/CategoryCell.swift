@@ -82,7 +82,5 @@ final class CategoryCell: UITableViewCell {
         self.layer.maskedCorners = corners
         self.contentView.layer.cornerRadius = 0
     }
-
-
 }
 
