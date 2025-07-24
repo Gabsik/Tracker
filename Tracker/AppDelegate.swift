@@ -1,6 +1,7 @@
 
 import UIKit
 import CoreData
+import AppMetricaCore
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -29,17 +30,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow?
     let tabBarController = UITabBarController()
-    //    let viewController = ViewController()
-    //    let statisticsViewController = StatisticsViewController()
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         window = UIWindow()
-        
-        //        tabBarController.setViewControllers([viewController, statisticsViewController], animated: true)
-        
         window?.rootViewController = tabBarController
         window?.makeKeyAndVisible()
+        
+        if let configuration = AppMetricaConfiguration(apiKey: "7621850f-b2c2-4442-8011-edcc609ee459") {
+            AppMetrica.activate(with: configuration)
+        }
         return true
     }
     

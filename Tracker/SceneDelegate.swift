@@ -5,6 +5,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     var window: UIWindow?
     let tabBarController = UITabBarController()
+    private let colors = Colors()
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         
@@ -14,15 +15,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         trackersVC.tabBarItem = UITabBarItem(title: "Трекеры", image: UIImage(named: "trackersIcon"), tag: 0)
         
         let statisticsVC = StatisticsViewController()
-        statisticsVC.tabBarItem = UITabBarItem(title: "Статистика", image: UIImage(named: "statisticsIcon"), tag: 1)
+        statisticsVC.tabBarItem = UITabBarItem(title: NSLocalizedString("static_title", comment: "Заголовок экрана"), image: UIImage(named: "statisticsIcon"), tag: 1)
         let trackersNavigationVC = UINavigationController(rootViewController: trackersVC)
         let statisticsNavigationVC = UINavigationController(rootViewController: statisticsVC )
         
         tabBarController.setViewControllers([trackersNavigationVC, statisticsNavigationVC], animated: true)
-        
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = .white
+        appearance.backgroundColor = colors.viewBackgroundColor
         appearance.shadowColor = .lightGray
         
         tabBarController.tabBar.standardAppearance = appearance

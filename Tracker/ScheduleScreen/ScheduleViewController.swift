@@ -26,7 +26,7 @@ final class ScheduleViewController: UIViewController {
     }
     
     private func setup() {
-        title = "Расписание"
+        title = NSLocalizedString("schedule_title", comment: "")
         view.backgroundColor = .white
     }
     private func addView() {
@@ -35,7 +35,7 @@ final class ScheduleViewController: UIViewController {
     }
     private func setupUI() {
         //MARK: setting readyButton
-        readyButton.setTitle("Готово", for: .normal)
+        readyButton.setTitle(NSLocalizedString("done", comment: ""), for: .normal)
         readyButton.backgroundColor = .blackCastom
         readyButton.setTitleColor(.white, for: .normal)
         readyButton.layer.cornerRadius = 16

@@ -29,7 +29,7 @@ final class AddCategoriesViewController: UIViewController {
     
     private func setup() {
         view.backgroundColor = .white
-        title = "Новая категория"
+        title = NSLocalizedString("newCategoryTitle", comment: "Заголовок экрана создания категории")
     }
     
     private func setting() {
@@ -37,7 +37,7 @@ final class AddCategoriesViewController: UIViewController {
         textField.backgroundColor = .background
         textField.layer.cornerRadius = 16
         textField.attributedPlaceholder = NSAttributedString(
-            string: "Введите название категории",
+            string: NSLocalizedString("enterCategoryPlaceholder", comment: "Плейсхолдер поля ввода категории"),
             attributes: [
                 .foregroundColor: UIColor.grayCastom,
                 .font: UIFont.systemFont(ofSize: 17, weight: .regular)
@@ -48,7 +48,7 @@ final class AddCategoriesViewController: UIViewController {
         textField.leftViewMode = .always
         
         //MARK: readyButton
-        readyButton.setTitle("Готово", for: .normal)
+        readyButton.setTitle(NSLocalizedString("doneButtonTitle", comment: "Кнопка Готово"), for: .normal)
         readyButton.layer.cornerRadius = 16
         readyButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         readyButton.addTarget(self, action: #selector(readyButtonTapped), for: .touchUpInside)

@@ -30,18 +30,20 @@ final class TrackerTypeSelectionViewController: UIViewController {
     
     private func setup() {
         view.backgroundColor = .white
-        title = "Создание трекера"
+        title = NSLocalizedString("create_tracker", comment: "")
     }
     
     private func settingUI() {
         //MARK: settingHabitButton
-        habitButton.setTitle("Привычка", for: .normal)
+//        habitButton.setTitle("Привычка", for: .normal)
+        habitButton.setTitle(NSLocalizedString("habit", comment: ""), for: .normal)
         habitButton.backgroundColor = .blackCastom
         habitButton.layer.cornerRadius = 16
         habitButton.addTarget(self, action: #selector(addHabitButtonTapped), for: .touchUpInside)
         
         //MARK: setting irregularEventBitton
-        irregularEventBitton.setTitle("Нерегулярное Событие", for: .normal)
+//        irregularEventBitton.setTitle("Нерегулярное Событие", for: .normal)
+        irregularEventBitton.setTitle(NSLocalizedString("irregular_event", comment: ""), for: .normal)
         irregularEventBitton.backgroundColor = .blackCastom
         irregularEventBitton.layer.cornerRadius = 16
         irregularEventBitton.addTarget(self, action: #selector(addirregularEventButtonTapped), for: .touchUpInside)
@@ -90,10 +92,7 @@ final class TrackerTypeSelectionViewController: UIViewController {
 }
 
 extension TrackerTypeSelectionViewController: IrregularEventViewControllerDelegate {
-//    func didCreatedIrregularevent(_ tracker: Tracker) {
-//        delegate?.didCreatedIrregularevent(tracker)
-//        self.dismiss(animated: true)
-//    }
+
     func didCreatedIrregularevent(_ tracker: Tracker, in category: TrackerCategory) {
         delegate?.didCreatedIrregularevent(tracker, in: category)
         self.dismiss(animated: true)

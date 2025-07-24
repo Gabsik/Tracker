@@ -34,13 +34,14 @@ final class CategoriesViewController: UIViewController {
 
     private func setup() {
         view.backgroundColor = .white
-        title = "Категория"
+        title = NSLocalizedString("categoryTitle", comment: "Заголовок выбора категории")
 
         tableView.separatorStyle = .none
 
         addCategoryButton.backgroundColor = .blackCastom
         addCategoryButton.layer.cornerRadius = 16
-        addCategoryButton.setTitle("Добавить категорию", for: .normal)
+//        addCategoryButton.setTitle("Добавить категорию", for: .normal)
+        addCategoryButton.setTitle(NSLocalizedString("addCategoryButtonTitle", comment: "Кнопка добавить категорию"), for: .normal)
         addCategoryButton.setTitleColor(.white, for: .normal)
         addCategoryButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         addCategoryButton.addTarget(self, action: #selector(addButtonTapped), for: .touchUpInside)
@@ -94,7 +95,7 @@ final class CategoriesViewController: UIViewController {
             imageView.snp.makeConstraints { $0.height.equalTo(80) }
 
             let label = UILabel()
-            label.text = "Привычки и события можно объединить по смыслу"
+            label.text = NSLocalizedString("categoryPlaceholder", comment: "Плейсхолдер при отсутствии категорий")
             label.textColor = .blackCastom
             label.font = .systemFont(ofSize: 12, weight: .medium)
             label.textAlignment = .center
